@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StrideX — Advanced Shoe Store</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">StrideX</div>
+    <nav>
+      <input id="search" placeholder="Search shoes, brands, sizes..." />
+      <button id="cart-btn">Cart (<span id="cart-count">0</span>)</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="filters">
+        <select id="category-filter">
+          <option value="all">All Categories</option>
+        </select>
+        <select id="sort">
+          <option value="popular">Sort: Popular</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="products" class="grid"></section>
+  </main>
+
+  <div id="product-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="modal-close">×</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="cart-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="cart-close">×</button>
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <div id="cart-total"></div>
+        <button id="checkout">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">© StrideX — Crafted with care</footer>
+  <script src="app.js" defer></script>
+</body>
+</html>

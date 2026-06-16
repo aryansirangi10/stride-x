@@ -3,6 +3,7 @@
 const $ = id => document.getElementById(id);
 
 // Application State
+let products = [];
 let cart = JSON.parse(localStorage.getItem('stridex_cart') || '[]');
 let activeCategory = 'all';
 let activeSort = 'popular';
@@ -11,12 +12,37 @@ let currentProduct = null;
 let selectedSize = null;
 let selectedColor = null;
 
+// Bespoke Customizer State
+let activeCustomizerPart = 'shoe-upper';
+let customizerColors = {
+  'shoe-upper': '#181a1f',
+  'shoe-midsole': '#ffffff',
+  'shoe-laces': '#ffffff',
+  'shoe-accents': '#dfba73'
+};
+
+// Promo & Shipping state
+let promoDiscount = 0.0; // 10% discount when MENTOR10 is applied
+
+// Color Names Mapping for customizer descriptions
+const colorNames = {
+  '#dfba73': 'Champagne Gold',
+  '#a21a24': 'Velvet Crimson',
+  '#2a4736': 'Forest Green',
+  '#121317': 'Stealth Obsidian',
+  '#eef1f6': 'Ice White',
+  '#1e3a8a': 'Cobalt Blue',
+  '#f59e0b': 'Vibrant Amber',
+  '#06b6d4': 'Cyan Glow'
+};
+
 // Initialization
 window.addEventListener('DOMContentLoaded', () => {
   wireEventListeners();
   loadProducts();
   updateCartUI();
   syncMentorConsole();
+  setupCustomizerDefaultColors();
 });
 
 // Fetch products from database API with search, filter, and sort options
@@ -38,9 +64,10 @@ async function loadProducts() {
 
     const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to load products');
-    const products = await res.json();
+    products = await res.json();
     
     renderProducts(products);
+    populateCustomizerDropdown();
   } catch (err) {
     console.error(err);
     productsContainer.innerHTML = `
@@ -88,7 +115,38 @@ function renderProducts(list) {
       </div>
     `;
 
+    // Apply 3D tilt interaction
+    apply3DTiltEffect(card);
+
     productsContainer.appendChild(card);
+  });
+}
+
+// 3D Card Tilt Interactive Effect
+function apply3DTiltEffect(card) {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const deltaX = x - centerX;
+    const deltaY = y - centerY;
+    
+    // Rotate relative to mouse coordinate offsets
+    const percentX = deltaX / centerX;
+    const percentY = deltaY / centerY;
+    
+    const rotateY = (percentX * 12).toFixed(1);  // Max 12 degrees
+    const rotateX = (-percentY * 12).toFixed(1);
+    
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
   });
 }
 
@@ -257,7 +315,6 @@ function addItemToCart() {
   );
 
   if (existingIndex > -1) {
-    // Check stock limit
     if (cart[existingIndex].qty + 1 > currentProduct.stock) {
       alert(`Cannot add more. Maximum available stock is ${currentProduct.stock}.`);
       return;
@@ -287,7 +344,7 @@ function saveCart() {
   localStorage.setItem('stridex_cart', JSON.stringify(cart));
 }
 
-// Update header cart count and drawer items list
+// Update header cart count and drawer items list with shipping tracker & promo code calculations
 function updateCartUI() {
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
   $('cart-count').textContent = totalQty;
@@ -303,6 +360,7 @@ function updateCartUI() {
     `;
     $('checkout').disabled = true;
     $('cart-pricing').innerHTML = '';
+    updateShippingTracker(0.0);
     return;
   }
 
@@ -348,17 +406,79 @@ function updateCartUI() {
     cartContainer.appendChild(card);
   });
 
-  // Calculate taxes, shipping
-  const shipping = subtotal >= 150 ? 0.0 : 15.00;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  // Calculate promo discount deductions
+  const discountAmount = subtotal * promoDiscount;
+  const discountedSubtotal = subtotal - discountAmount;
 
-  $('cart-pricing').innerHTML = `
+  // Update Free Shipping Progress bar based on subtotal after discount
+  updateShippingTracker(discountedSubtotal);
+
+  // shipping calculation
+  const shipping = discountedSubtotal >= 150 ? 0.0 : 15.00;
+  const tax = discountedSubtotal * 0.08;
+  const total = discountedSubtotal + shipping + tax;
+
+  let pricingHtml = `
     <div class="price-row"><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+  `;
+
+  if (promoDiscount > 0) {
+    pricingHtml += `
+      <div class="price-row text-success"><span>Promo Code Discount (10%):</span><span>-$${discountAmount.toFixed(2)}</span></div>
+    `;
+  }
+
+  pricingHtml += `
     <div class="price-row"><span>Shipping:</span><span>${shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div>
     <div class="price-row"><span>Tax (8%):</span><span>$${tax.toFixed(2)}</span></div>
     <div class="price-row grand-total"><span>Total:</span><span>$${total.toFixed(2)}</span></div>
   `;
+
+  $('cart-pricing').innerHTML = pricingHtml;
+}
+
+// Update the Shipping Tracker Progress Bar (Gamified Feature)
+function updateShippingTracker(subtotal) {
+  const milestone = 150.0;
+  const progressPercent = Math.min((subtotal / milestone) * 100, 100);
+  const progressBar = $('shipping-progress');
+  const trackerText = $('shipping-tracker-text');
+
+  progressBar.style.width = `${progressPercent}%`;
+  progressBar.setAttribute('aria-valuenow', progressPercent);
+
+  if (subtotal === 0) {
+    trackerText.textContent = "Add items to qualify for free shipping";
+    progressBar.className = "progress-bar bg-secondary";
+  } else if (subtotal >= milestone) {
+    trackerText.textContent = "✓ You qualify for Free Express Shipping!";
+    trackerText.style.color = "#10b981";
+    progressBar.className = "progress-bar bg-success";
+  } else {
+    const remaining = milestone - subtotal;
+    trackerText.textContent = `Add $${remaining.toFixed(2)} more for Free Shipping`;
+    trackerText.style.color = "var(--text-muted)";
+    progressBar.className = "progress-bar bg-warning";
+  }
+}
+
+// Apply promo code (MENTOR10)
+function applyPromoCode() {
+  const input = $('promo-input').value.trim().toUpperCase();
+  const msg = $('promo-active-msg');
+
+  if (input === 'MENTOR10') {
+    promoDiscount = 0.1; // 10%
+    msg.textContent = "Coupon 'MENTOR10' applied: 10% discount active!";
+    msg.classList.remove('d-none');
+    updateCartUI();
+  } else if (input === '') {
+    promoDiscount = 0.0;
+    msg.classList.add('d-none');
+    updateCartUI();
+  } else {
+    alert("Invalid promo code. Enter MENTOR10 to test discounts.");
+  }
 }
 
 function adjustQty(index, delta) {
@@ -430,8 +550,14 @@ async function handleCheckoutSubmit(e) {
     $('checkout-form').classList.add('d-none');
     $('checkout-success').classList.remove('d-none');
 
+    // Apply 10% discount calculation to final receipt display
+    const finalTotal = data.total_price * (1 - promoDiscount);
+    const shippingCost = finalTotal >= 150 ? 0.0 : 15.0;
+    const taxCost = finalTotal * 0.08;
+    const grandTotal = finalTotal + shippingCost + taxCost;
+
     $('rec-id').textContent = `#${data.order_id}`;
-    $('rec-total').textContent = `$${data.total_price.toFixed(2)}`;
+    $('rec-total').textContent = `$${grandTotal.toFixed(2)}`;
     $('rec-name').textContent = data.customer_name;
     $('rec-email').textContent = data.customer_email;
 
@@ -447,8 +573,11 @@ async function handleCheckoutSubmit(e) {
       receiptItems.appendChild(itEl);
     });
 
-    // Reset local cart
+    // Reset local cart & discount
     cart = [];
+    promoDiscount = 0.0;
+    $('promo-input').value = '';
+    $('promo-active-msg').classList.add('d-none');
     saveCart();
     updateCartUI();
     
@@ -588,6 +717,9 @@ async function resetDatabase() {
     
     // Clear cart and states
     cart = [];
+    promoDiscount = 0.0;
+    $('promo-input').value = '';
+    $('promo-active-msg').classList.add('d-none');
     saveCart();
     updateCartUI();
 
@@ -602,6 +734,117 @@ async function resetDatabase() {
   } catch (err) {
     alert(`Reset Error: ${err.message}`);
   }
+}
+
+// Bespoke Configurator: Setup default coloring
+function setupCustomizerDefaultColors() {
+  // Apply initial colors to SVG paths
+  $('shoe-upper').setAttribute('fill', customizerColors['shoe-upper']);
+  $('shoe-midsole').setAttribute('fill', customizerColors['shoe-midsole']);
+  $('shoe-laces').setAttribute('stroke', customizerColors['shoe-laces']);
+  $('shoe-accents').setAttribute('fill', customizerColors['shoe-accents']);
+}
+
+// Populate Customizer Dropdown
+function populateCustomizerDropdown() {
+  const select = $('cust-base-shoe');
+  if (select.children.length > 0) return; // already populated
+
+  products.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.name} - $${p.price.toFixed(2)}`;
+    select.appendChild(opt);
+  });
+}
+
+// Handle Customizer Swatch Click
+function handleSwatchClick(e) {
+  const color = e.target.getAttribute('data-color');
+  if (!color) return;
+
+  // Update active swatch state
+  document.querySelectorAll('.swatch-btn').forEach(el => el.classList.remove('active'));
+  e.target.classList.add('active');
+
+  // Recolor SVG element
+  const svgElement = $(activeCustomizerPart);
+  if (activeCustomizerPart === 'shoe-laces') {
+    svgElement.setAttribute('stroke', color);
+  } else {
+    svgElement.setAttribute('fill', color);
+  }
+
+  // Update color states
+  customizerColors[activeCustomizerPart] = color;
+
+  // Update labels
+  const colorName = colorNames[color] || color;
+  const partText = activeCustomizerPart.replace('shoe-', '').toUpperCase();
+  $('part-color-label').textContent = `3. Apply ${colorName} to ${partText}`;
+}
+
+// Handle Add Custom Sneaker to Cart
+function handleAddCustomToCart() {
+  const baseShoeId = parseInt($('cust-base-shoe').value);
+  const size = $('cust-size').value;
+
+  const baseShoe = products.find(p => p.id === baseShoeId);
+  if (!baseShoe) {
+    alert('Select a base model first.');
+    return;
+  }
+
+  // Check if base shoe has stock
+  if (baseShoe.stock <= 0) {
+    alert('This base model is currently out of stock.');
+    return;
+  }
+
+  // Create descriptive custom colorway string
+  const upperCol = colorNames[customizerColors['shoe-upper']] || customizerColors['shoe-upper'];
+  const midsoleCol = colorNames[customizerColors['shoe-midsole']] || customizerColors['shoe-midsole'];
+  const lacesCol = colorNames[customizerColors['shoe-laces']] || customizerColors['shoe-laces'];
+  const accentsCol = colorNames[customizerColors['shoe-accents']] || customizerColors['shoe-accents'];
+
+  const customColorwayName = `Bespoke (Upper: ${upperCol}, Sole: ${midsoleCol}, Laces: ${lacesCol}, Logo: ${accentsCol})`;
+
+  // Add $20 premium for custom design order
+  const customPrice = baseShoe.price + 20.00;
+
+  // Check if exact custom model already in cart
+  const existingIndex = cart.findIndex(item => 
+    item.id === baseShoe.id && 
+    item.size === size && 
+    item.color === customColorwayName
+  );
+
+  if (existingIndex > -1) {
+    if (cart[existingIndex].qty + 1 > baseShoe.stock) {
+      alert(`Cannot add more. Maximum available stock is ${baseShoe.stock}.`);
+      return;
+    }
+    cart[existingIndex].qty += 1;
+  } else {
+    cart.push({
+      id: baseShoe.id,
+      name: `Bespoke ${baseShoe.name}`,
+      brand: baseShoe.brand,
+      price: customPrice,
+      image: baseShoe.image_url,
+      size: size,
+      color: customColorwayName,
+      qty: 1,
+      maxStock: baseShoe.stock
+    });
+  }
+
+  saveCart();
+  updateCartUI();
+  openCartDrawer();
+  
+  // Quick alert overlay toast simulation
+  alert(`Bespoke ${baseShoe.name} added to shopping drawer with a +$20 custom laboratory dye premium!`);
 }
 
 // Event Listeners Mapping
@@ -638,7 +881,6 @@ function wireEventListeners() {
   // Close modals clicking outside
   document.querySelectorAll('dialog').forEach(dialog => {
     dialog.addEventListener('click', (e) => {
-      // Prevent dialog close if clicking inside modal-container card
       const rect = dialog.firstElementChild.getBoundingClientRect();
       const inCard = e.clientX >= rect.left && e.clientX <= rect.right &&
                      e.clientY >= rect.top && e.clientY <= rect.bottom;
@@ -701,4 +943,50 @@ function wireEventListeners() {
       if (id) openProductModal(id);
     }
   });
+
+  // Customizer: Part selectors click triggers
+  document.querySelectorAll('.part-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.part-btn').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      activeCustomizerPart = btn.getAttribute('data-part');
+
+      // Update swatch active outline matching active color of the part
+      const activeColor = customizerColors[activeCustomizerPart];
+      document.querySelectorAll('.swatch-btn').forEach(sw => {
+        sw.classList.remove('active');
+        if (sw.getAttribute('data-color') === activeColor) {
+          sw.classList.add('active');
+        }
+      });
+
+      // Update text
+      const colorName = colorNames[activeColor] || activeColor;
+      const partText = activeCustomizerPart.replace('shoe-', '').toUpperCase();
+      $('part-color-label').textContent = `3. Apply ${colorName} to ${partText}`;
+    });
+  });
+
+  // Customizer: Swatches click triggers
+  document.querySelectorAll('.swatch-btn').forEach(btn => {
+    btn.addEventListener('click', handleSwatchClick);
+  });
+
+  // Customizer: Add Custom Sneaker to Cart
+  $('cust-add-to-cart').addEventListener('click', handleAddCustomToCart);
+
+  // Customizer: Allow direct clicking on SVG shoe paths to select that part
+  document.querySelectorAll('.customizer-path').forEach(path => {
+    path.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const partId = path.id;
+      
+      // Trigger click on corresponding part button
+      const partBtn = document.querySelector(`.part-btn[data-part="${partId}"]`);
+      if (partBtn) partBtn.click();
+    });
+  });
+
+  // Promo code apply click trigger
+  $('promo-apply-btn').addEventListener('click', applyPromoCode);
 }

@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StrideX — Luxury Footwear & Performance Shoes</title>
+  <title>StrideX — Bespoke Luxury Footwear</title>
   
   <!-- Premium Google Fonts: Playfair Display (Serif) & Outfit (Sans-Serif) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
 <body>
 
   <!-- Header & Navigation Bar -->
-  <header class="site-header sticky-top py-2">
+  <header class="site-header sticky-top py-3">
     <div class="container-fluid px-4">
       <div class="row align-items-center justify-content-between g-2">
         <div class="col-auto">
@@ -27,10 +27,12 @@
         </div>
         
         <div class="col col-md-5 col-lg-4 px-lg-3 d-none d-md-block">
-          <input id="search" class="form-control search-input w-100" type="search" placeholder="Search premium collection..." aria-label="Search">
+          <input id="search" class="form-control search-input w-100" type="search" placeholder="Search the collection..." aria-label="Search">
         </div>
         
         <div class="col-auto d-flex align-items-center gap-3">
+          <a href="#bespoke-lab" class="nav-link d-none d-lg-inline-block text-uppercase small fw-bold tracking-wider" style="color: var(--accent-color) !important;">Bespoke Lab</a>
+          <a href="#shop" class="nav-link d-none d-lg-inline-block text-uppercase small fw-bold tracking-wider">Catalog</a>
           <button id="cart-btn" class="cart-btn">
             <span>Cart</span>
             <span id="cart-count" class="badge">0</span>
@@ -38,69 +40,147 @@
         </div>
       </div>
       
-      <!-- Mobile Search Bar (Visible only on small screens) -->
+      <!-- Mobile Search Bar -->
       <div class="row mt-2 d-md-none">
         <div class="col-12">
-          <input id="search-mobile" class="form-control search-input w-100" type="search" placeholder="Search premium collection..." aria-label="Search">
+          <input id="search-mobile" class="form-control search-input w-100" type="search" placeholder="Search the collection..." aria-label="Search">
         </div>
       </div>
     </div>
   </header>
 
   <main>
-    <!-- Hero Slider / Carousel Section -->
-    <section class="hero-carousel">
-      <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-        </div>
-        
-        <div class="carousel-inner">
-          <!-- Slide 1 -->
-          <div class="carousel-item active hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('assets/images/aerorun_300.png');">
-            <div class="container px-4">
-              <div class="hero-content">
-                <span class="hero-badge">New Release</span>
-                <h1 class="display-3 text-white mb-3">AeroRun 300<br><span class="highlight">Marathon Dynamics</span></h1>
-                <p class="lead text-secondary mb-4">Precision-engineered with nitrogen-infused foam for ultra-responsive energy return and lightweight breathability.</p>
-                <button class="btn-accent view-hero-btn" data-id="1">Explore Release</button>
+    <!-- Immersive Split Hero Section -->
+    <section class="hero-split-section">
+      <div class="container-fluid h-100 p-0">
+        <div class="row g-0 h-100 align-items-stretch">
+          <!-- Left: Editorial Typography -->
+          <div class="col-lg-6 hero-text-col d-flex align-items-center px-4 px-md-5 py-5">
+            <div class="hero-editorial-wrapper">
+              <span class="hero-badge">Bespoke Collection 2026</span>
+              <h1 class="hero-title my-3">Defying Gravity.<br>Defining <span class="highlight">Luxury.</span></h1>
+              <p class="hero-subtitle mb-4">Handcrafted performance footwear engineered in our bespoke design lab. Every seam, stitch, and foam compound custom-made for the modern athlete.</p>
+              <div class="d-flex flex-wrap gap-3">
+                <a href="#bespoke-lab" class="btn-accent py-3 px-4">Enter Bespoke Lab</a>
+                <a href="#shop" class="btn-secondary-custom py-3 px-4">Browse Collection</a>
               </div>
             </div>
           </div>
-          <!-- Slide 2 -->
-          <div class="carousel-item hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('assets/images/trailmaster_x.png');">
-            <div class="container px-4">
-              <div class="hero-content">
-                <span class="hero-badge">Adventure Elite</span>
-                <h1 class="display-3 text-white mb-3">TrailMaster X<br><span class="highlight">Conquer Technical Dirt</span></h1>
-                <p class="lead text-secondary mb-4">Water-resistant ripstop nylon and multi-directional traction lugs designed to tackle mud and rocky slopes.</p>
-                <button class="btn-accent view-hero-btn" data-id="2">Explore Outdoor</button>
-              </div>
+          
+          <!-- Right: Visual floating shoe product image -->
+          <div class="col-lg-6 hero-image-col d-flex align-items-center justify-content-center position-relative py-5">
+            <div class="hero-glow-back"></div>
+            <div class="hero-shoe-display">
+              <img src="assets/images/aerorun_300.png" id="hero-shoe-img" alt="AeroRun 300" class="img-fluid floating-animation">
             </div>
-          </div>
-          <!-- Slide 3 -->
-          <div class="carousel-item hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('assets/images/apexlift_500.png');">
-            <div class="container px-4">
-              <div class="hero-content">
-                <span class="hero-badge">Premium Gym</span>
-                <h1 class="display-3 text-white mb-3">ApexLift 500<br><span class="highlight">Absolute Strength Stability</span></h1>
-                <p class="lead text-secondary mb-4">Engineered for maximum power delivery with a non-compressible sole and heavy-duty lockdown straps.</p>
-                <button class="btn-accent view-hero-btn" data-id="5">Explore Training</button>
-              </div>
+            <!-- Interactive Float Card overlay -->
+            <div class="hero-stats-card p-3">
+              <div class="text-white small fw-bold">AeroRun 300</div>
+              <div class="text-muted small">Cushion: Max Rebound</div>
+              <div class="text-accent small fw-bold mt-1">$129.99</div>
             </div>
           </div>
         </div>
-        
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
+      </div>
+    </section>
+
+    <!-- Bespoke Sneaker Lab (Interactive Shoe Configurator) -->
+    <section id="bespoke-lab" class="bespoke-lab-section py-5">
+      <div class="container py-4">
+        <div class="text-center mb-5">
+          <span class="text-accent text-uppercase small fw-bold tracking-wider">StrideX Sneaker Lab</span>
+          <h2 class="h1 text-white fw-light mt-2 mb-3" style="font-family: var(--font-serif);">Bespoke Customizer</h2>
+          <p class="text-muted mx-auto" style="max-width: 600px;">Select a design base, pick your shoe components, and apply luxury dye swatches to build your unique model.</p>
+        </div>
+
+        <div class="row g-5 align-items-center">
+          <!-- Left: Dynamic Recolor-ready SVG Canvas -->
+          <div class="col-lg-7 d-flex justify-content-center">
+            <div class="customizer-canvas-card p-4 w-100 d-flex flex-column align-items-center">
+              <div class="customizer-canvas-wrapper w-100 d-flex align-items-center justify-content-center">
+                <!-- Shoe SVG Side View -->
+                <svg viewBox="0 0 400 250" width="100%" height="320" id="customizer-svg" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.5"/>
+                    </filter>
+                  </defs>
+                  
+                  <g filter="url(#shadow)">
+                    <!-- Outsole Base -->
+                    <path id="shoe-midsole" class="customizer-path" d="M 40,195 Q 120,210 200,200 Q 280,190 360,200 L 350,170 Q 260,165 180,170 Q 100,175 50,175 Z" fill="#ffffff" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                    <!-- Upper Mesh Body -->
+                    <path id="shoe-upper" class="customizer-path" d="M 50,175 Q 100,175 180,170 Q 260,165 350,170 C 360,135 330,95 280,80 C 260,75 230,90 210,110 C 190,90 140,85 90,125 C 70,135 50,155 50,175 Z" fill="#181a1f" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                    <!-- Accent overlays -->
+                    <path id="shoe-accents" class="customizer-path" d="M 120,160 C 160,155 210,135 250,110 C 220,120 170,145 120,160 Z M 90,125 Q 140,125 180,145 Q 130,135 90,125 Z" fill="#dfba73" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                    <!-- Laces -->
+                    <path id="shoe-laces" class="customizer-path" d="M 215,113 L 230,130 M 225,103 L 240,120 M 235,93 L 250,110 M 245,83 L 260,100 M 255,73 L 270,90" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="customizer-info-badge mt-3 text-muted small">
+                🎨 Click parts directly on the shoe or use the menu to recolor.
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Customizer controls -->
+          <div class="col-lg-5">
+            <div class="customizer-controls-card p-4">
+              <!-- Select Base Model -->
+              <div class="mb-4">
+                <label class="control-label mb-2">1. Choose Base Model</label>
+                <select id="cust-base-shoe" class="form-select sort-select w-100">
+                  <!-- Loaded dynamically -->
+                </select>
+              </div>
+
+              <!-- Select Component Part -->
+              <div class="mb-4">
+                <label class="control-label mb-2">2. Select Part to Color</label>
+                <div class="part-selector-grid">
+                  <button class="part-btn active" data-part="shoe-upper">Mesh Upper</button>
+                  <button class="part-btn" data-part="shoe-midsole">Midsole Sole</button>
+                  <button class="part-btn" data-part="shoe-laces">Shoe Laces</button>
+                  <button class="part-btn" data-part="shoe-accents">Accent Logo</button>
+                </div>
+              </div>
+
+              <!-- Select Color Swatch -->
+              <div class="mb-4">
+                <label id="part-color-label" class="control-label mb-2">3. Apply Champagne Dye</label>
+                <div class="swatches-grid">
+                  <button class="swatch-btn active" data-color="#dfba73" style="background-color: #dfba73;" title="Champagne Gold"></button>
+                  <button class="swatch-btn" data-color="#a21a24" style="background-color: #a21a24;" title="Velvet Crimson"></button>
+                  <button class="swatch-btn" data-color="#2a4736" style="background-color: #2a4736;" title="Forest Green"></button>
+                  <button class="swatch-btn" data-color="#121317" style="background-color: #121317;" title="Stealth Obsidian"></button>
+                  <button class="swatch-btn" data-color="#eef1f6" style="background-color: #eef1f6;" title="Ice White"></button>
+                  <button class="swatch-btn" data-color="#1e3a8a" style="background-color: #1e3a8a;" title="Cobalt Blue"></button>
+                  <button class="swatch-btn" data-color="#f59e0b" style="background-color: #f59e0b;" title="Vibrant Amber"></button>
+                  <button class="swatch-btn" data-color="#06b6d4" style="background-color: #06b6d4;" title="Cyan Glow"></button>
+                </div>
+              </div>
+
+              <!-- Size and buy button -->
+              <div class="row g-3 align-items-end">
+                <div class="col-sm-4">
+                  <label for="cust-size" class="control-label mb-2">Size (US)</label>
+                  <select id="cust-size" class="form-select sort-select w-100">
+                    <option value="7">US 7</option>
+                    <option value="8">US 8</option>
+                    <option value="9">US 9</option>
+                    <option value="10" selected>US 10</option>
+                    <option value="11">US 11</option>
+                    <option value="12">US 12</option>
+                  </select>
+                </div>
+                <div class="col-sm-8">
+                  <button id="cust-add-to-cart" class="btn-accent w-100 py-3">Buy Bespoke Colorway</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -160,7 +240,6 @@
 
       <!-- Dynamic Grid Container -->
       <div id="products" class="products-grid">
-        <!-- Rendered via app.js -->
         <div class="text-center w-100 py-5">
           <div class="spinner-border text-warning" role="status">
             <span class="visually-hidden">Loading collection...</span>
@@ -276,9 +355,7 @@
           <div class="modal-tab-content">
             <!-- Reviews Pane -->
             <div id="tab-reviews" class="modal-tab-pane active">
-              <div id="detail-reviews-list" class="mb-4">
-                <!-- User reviews loaded dynamically -->
-              </div>
+              <div id="detail-reviews-list" class="mb-4"></div>
               
               <!-- Review Submission Form -->
               <form id="review-form" class="review-form">
@@ -333,12 +410,30 @@
         <h2 class="h4 mb-0 text-white fw-bold" style="font-family: var(--font-serif);">Shopping Drawer</h2>
         <button id="cart-close" class="modal-close-btn">&times;</button>
       </div>
+
+      <!-- Free Shipping Milestone Progress Tracker (Gamification) -->
+      <div class="shipping-tracker-wrapper px-4 pt-3 pb-2 bg-dark">
+        <div class="d-flex justify-content-between text-muted small mb-1">
+          <span id="shipping-tracker-text">Add items to qualify for free shipping</span>
+          <span id="shipping-tracker-milestone">$150.00</span>
+        </div>
+        <div class="progress" style="height: 6px; background-color: rgba(255,255,255,0.05);">
+          <div id="shipping-progress" class="progress-bar bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
       
       <div id="cart-items" class="drawer-body">
         <!-- Rendered dynamically -->
       </div>
       
       <div class="drawer-footer">
+        <!-- Coupon Code Box -->
+        <div class="promo-box mb-3 d-flex gap-2">
+          <input type="text" id="promo-input" class="checkout-input flex-grow-1" placeholder="Promo code (MENTOR10)">
+          <button id="promo-apply-btn" class="btn-secondary-custom py-2 px-3 text-nowrap">Apply</button>
+        </div>
+        <div id="promo-active-msg" class="small text-success mb-2 d-none"></div>
+
         <div id="cart-pricing" class="d-flex flex-column gap-2 mb-4">
           <!-- Pricing summary rows rendered dynamically -->
         </div>

@@ -1,13 +1,19 @@
-const PRODUCTS_URL = 'products.json';
+const PRODUCTS_URL = '/api/products';
 let products = [];
 const $ = id => document.getElementById(id);
 
 async function load(){
-  const res = await fetch(PRODUCTS_URL);
-  products = await res.json();
-  populateFilters();
-  render(products);
-  restoreCartUI();
+  try {
+    const res = await fetch(PRODUCTS_URL);
+    if (!res.ok) throw new Error('Failed to fetch products');
+    products = await res.json();
+    populateFilters();
+    render(products);
+    restoreCartUI();
+  } catch (err) {
+    console.error(err);
+    $('products').innerHTML = '<p class="text-white text-center w-100">Could not load products from the backend API.</p>';
+  }
 }
 
 function populateFilters(){
@@ -25,22 +31,26 @@ function render(list){
   const renderLogic = () => {
     const container = $('products'); 
     container.innerHTML = '';
+    
+    if(list.length === 0) {
+      container.innerHTML = '<p class="text-white text-center w-100">No products found.</p>';
+      return;
+    }
+    
     list.forEach(p=>{
       const card = document.createElement('article'); 
       card.className = 'card';
-      // Enable view transitions on individual cards if supported by giving them a unique name
-      // card.style.viewTransitionName = `product-${p.id}`;
       
       card.innerHTML = `
         <img src="${p.image}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <div class="meta">
+        <h3 class="text-white mt-3 mb-2 fs-5">${p.name}</h3>
+        <div class="meta d-flex justify-content-between align-items-center mb-3">
           <div class="brand-badge">${p.brand}</div>
-          <div class="price">$${p.price.toFixed(2)}</div>
+          <div class="fw-bold fs-5 text-info" style="color: var(--accent-color) !important;">$${p.price.toFixed(2)}</div>
         </div>
-        <div class="card-actions">
+        <div class="d-flex gap-2 mt-auto">
           <button class="btn-view">View</button>
-          <button class="btn-add">Add to Cart</button>
+          <button class="btn custom-primary flex-grow-1 btn-add">Add to Cart</button>
         </div>
       `;
       card.querySelector('.btn-view').addEventListener('click', () => openModal(p));
@@ -48,7 +58,6 @@ function render(list){
       container.appendChild(card);
     });
     
-    // Setup intersection observer for scroll animations
     setupObservers();
   };
 
@@ -76,14 +85,16 @@ function setupObservers() {
 function openModal(p){
   const modal = $('product-modal');
   $('modal-body').innerHTML = `
-    <div class="modal-split">
-      <img src="${p.image}" alt="${p.name}">
-      <div class="modal-info">
-        <h2>${p.name}</h2>
-        <p><strong>Brand:</strong> ${p.brand}</p>
-        <p>${p.description}</p>
-        <div class="price-tag">$${p.price.toFixed(2)}</div>
-        <button id="modal-add" class="primary-btn">Add to Cart</button>
+    <div class="row g-4 align-items-center">
+      <div class="col-md-6">
+        <img src="${p.image}" alt="${p.name}" class="img-fluid rounded-4 w-100" style="object-fit:cover;">
+      </div>
+      <div class="col-md-6">
+        <h2 class="text-white fw-bold mb-2">${p.name}</h2>
+        <p class="text-muted mb-3"><strong>Brand:</strong> ${p.brand}</p>
+        <p class="text-light">${p.description}</p>
+        <div class="fs-2 fw-bold text-info my-4" style="color: var(--accent-color) !important;">$${p.price.toFixed(2)}</div>
+        <button id="modal-add" class="btn btn-lg custom-primary w-100">Add to Cart</button>
       </div>
     </div>
   `;
@@ -117,24 +128,24 @@ function showCart(){
   const items = Object.entries(c).map(([id,qty]) => { 
     const p = products.find(x => x.id == id); 
     return {p, qty}; 
-  });
+  }).filter(it => it.p); // exclude if product not found
   
   const el = $('cart-items'); 
   el.innerHTML = ''; 
   let sum = 0;
   
   if (items.length === 0) {
-    el.innerHTML = '<p style="color:var(--text-main); text-align:center; padding: 20px;">Your cart is empty.</p>';
+    el.innerHTML = '<p class="text-muted text-center p-4">Your cart is empty.</p>';
   } else {
     items.forEach(it => { 
       const row = document.createElement('div'); 
       row.className = 'cart-item'; 
       row.innerHTML = `
-        <div class="cart-item-info">
-          <strong>${it.p.name}</strong>
-          <span>Qty: ${it.qty}</span>
+        <div>
+          <strong class="d-block text-white mb-1">${it.p.name}</strong>
+          <span class="text-muted small">Qty: ${it.qty}</span>
         </div>
-        <div class="cart-item-price">$${(it.qty * it.p.price).toFixed(2)}</div>
+        <div class="fw-bold" style="color: var(--accent-color);">$${(it.qty * it.p.price).toFixed(2)}</div>
       `; 
       el.appendChild(row); 
       sum += it.qty * it.p.price; 

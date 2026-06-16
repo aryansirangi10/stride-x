@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StrideX — Premium Footwear</title>
+  
+  <!-- Modern Font: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="site-wrapper">
+    <header class="site-header">
+      <div class="brand">Stride<span class="highlight">X</span></div>
+      <nav>
+        <div class="search-wrapper">
+          <input id="search" placeholder="Search premium shoes..." />
+        </div>
+        <button id="cart-btn" class="glass-btn">
+          Cart <span id="cart-count" class="badge">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <h1>Step into the <span class="gradient-text">Future</span></h1>
+          <p>Discover the finest selection of premium footwear engineered for performance and styled for the streets.</p>
+        </div>
+      </section>
+
+      <section class="controls">
+        <div class="filters">
+          <select id="category-filter" class="glass-select">
+            <option value="all">All Categories</option>
+          </select>
+          <select id="sort" class="glass-select">
+            <option value="popular">Sort: Popular</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+          </select>
+        </div>
+      </section>
+
+      <section id="products" class="grid"></section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="brand">Stride<span class="highlight">X</span></div>
+        <p>© 2026 StrideX. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Native Dialog for Product Modal -->
+  <dialog id="product-modal" class="modal">
+    <div class="modal-content">
+      <button id="modal-close" class="close-btn">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </dialog>
+
+  <!-- Native Dialog for Slide-out Cart -->
+  <dialog id="cart-modal" class="side-drawer">
+    <div class="drawer-header">
+      <h2>Your Cart</h2>
+      <button id="cart-close" class="close-btn">&times;</button>
+    </div>
+    <div id="cart-items" class="drawer-body"></div>
+    <div class="drawer-footer">
+      <div id="cart-total" class="total-price"></div>
+      <button id="checkout" class="primary-btn checkout-btn">Proceed to Checkout</button>
+    </div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

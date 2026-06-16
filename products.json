@@ -1,0 +1,6 @@
+[
+  {"id":"1","name":"AeroRun 300","brand":"StrideTech","category":"Running","price":129.99,"description":"Lightweight running shoe with responsive foam and breathable mesh.","image":"https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?w=800&q=80"},
+  {"id":"2","name":"TrailMaster X","brand":"TerraFit","category":"Trail","price":149.99,"description":"Durable outsole and water-resistant upper for all-terrain runs.","image":"https://images.unsplash.com/photo-1528701800489-4764b47f1a2b?w=800&q=80"},
+  {"id":"3","name":"UrbanFlex Lo","brand":"MetroStep","category":"Casual","price":89.99,"description":"Stylish everyday sneaker with memory insole for comfort.","image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80"},
+  {"id":"4","name":"CourtPro Elite","brand":"VolleyEdge","category":"Sport","price":119.99,"description":"High-traction court shoe with ankle support for fast moves.","image":"https://images.unsplash.com/photo-1600180758890-4c7b6c2f3b8b?w=800&q=80"}
+]

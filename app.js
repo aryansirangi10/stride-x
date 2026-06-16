@@ -107,7 +107,7 @@ function renderProducts(list) {
       <div class="product-brand">${p.brand}</div>
       <h3 class="product-name">${p.name}</h3>
       <div class="product-meta-row">
-        <div class="product-price">$${p.price.toFixed(2)}</div>
+        <div class="product-price">₹${p.price.toFixed(2)}</div>
         <div class="product-rating">
           <span class="stars-display">${starString}</span>
           <span class="text-muted">(${p.reviews_count})</span>
@@ -174,7 +174,7 @@ async function openProductModal(productId) {
     $('detail-img').alt = currentProduct.name;
     $('detail-brand').textContent = currentProduct.brand;
     $('detail-name').textContent = currentProduct.name;
-    $('detail-price').textContent = `$${currentProduct.price.toFixed(2)}`;
+    $('detail-price').textContent = `₹${currentProduct.price.toFixed(2)}`;
     $('detail-desc').textContent = currentProduct.description;
     
     $('detail-stars').textContent = getStarRatingHTML(currentProduct.rating);
@@ -385,7 +385,7 @@ function updateCartUI() {
           <button class="qty-btn inc-btn" data-index="${index}">+</button>
         </div>
       </div>
-      <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+      <div class="cart-item-price">₹${(item.price * item.qty).toFixed(2)}</div>
       <button class="cart-item-remove-btn" data-index="${index}" aria-label="Remove">&times;</button>
     `;
 
@@ -413,25 +413,25 @@ function updateCartUI() {
   // Update Free Shipping Progress bar based on subtotal after discount
   updateShippingTracker(discountedSubtotal);
 
-  // shipping calculation
-  const shipping = discountedSubtotal >= 150 ? 0.0 : 15.00;
+  // shipping calculation (Milestone ₹12,000, Shipping cost ₹1,200)
+  const shipping = discountedSubtotal >= 12000 ? 0.0 : 1200.00;
   const tax = discountedSubtotal * 0.08;
   const total = discountedSubtotal + shipping + tax;
 
   let pricingHtml = `
-    <div class="price-row"><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+    <div class="price-row"><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
   `;
 
   if (promoDiscount > 0) {
     pricingHtml += `
-      <div class="price-row text-success"><span>Promo Code Discount (10%):</span><span>-$${discountAmount.toFixed(2)}</span></div>
+      <div class="price-row text-success"><span>Promo Code Discount (10%):</span><span>-₹${discountAmount.toFixed(2)}</span></div>
     `;
   }
 
   pricingHtml += `
-    <div class="price-row"><span>Shipping:</span><span>${shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div>
-    <div class="price-row"><span>Tax (8%):</span><span>$${tax.toFixed(2)}</span></div>
-    <div class="price-row grand-total"><span>Total:</span><span>$${total.toFixed(2)}</span></div>
+    <div class="price-row"><span>Shipping:</span><span>${shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span></div>
+    <div class="price-row"><span>Tax (8%):</span><span>₹${tax.toFixed(2)}</span></div>
+    <div class="price-row grand-total"><span>Total:</span><span>₹${total.toFixed(2)}</span></div>
   `;
 
   $('cart-pricing').innerHTML = pricingHtml;
@@ -439,7 +439,7 @@ function updateCartUI() {
 
 // Update the Shipping Tracker Progress Bar (Gamified Feature)
 function updateShippingTracker(subtotal) {
-  const milestone = 150.0;
+  const milestone = 12000.0;
   const progressPercent = Math.min((subtotal / milestone) * 100, 100);
   const progressBar = $('shipping-progress');
   const trackerText = $('shipping-tracker-text');
@@ -456,7 +456,7 @@ function updateShippingTracker(subtotal) {
     progressBar.className = "progress-bar bg-success";
   } else {
     const remaining = milestone - subtotal;
-    trackerText.textContent = `Add $${remaining.toFixed(2)} more for Free Shipping`;
+    trackerText.textContent = `Add ₹${remaining.toFixed(2)} more for Free Shipping`;
     trackerText.style.color = "var(--text-muted)";
     progressBar.className = "progress-bar bg-warning";
   }
@@ -552,12 +552,12 @@ async function handleCheckoutSubmit(e) {
 
     // Apply 10% discount calculation to final receipt display
     const finalTotal = data.total_price * (1 - promoDiscount);
-    const shippingCost = finalTotal >= 150 ? 0.0 : 15.0;
+    const shippingCost = finalTotal >= 12000 ? 0.0 : 1200.0;
     const taxCost = finalTotal * 0.08;
     const grandTotal = finalTotal + shippingCost + taxCost;
 
     $('rec-id').textContent = `#${data.order_id}`;
-    $('rec-total').textContent = `$${grandTotal.toFixed(2)}`;
+    $('rec-total').textContent = `₹${grandTotal.toFixed(2)}`;
     $('rec-name').textContent = data.customer_name;
     $('rec-email').textContent = data.customer_email;
 
@@ -568,7 +568,7 @@ async function handleCheckoutSubmit(e) {
       itEl.className = 'd-flex justify-content-between small text-muted py-1';
       itEl.innerHTML = `
         <span>${item.name} (US ${item.size} - ${item.color}) x${item.qty}</span>
-        <span>$${(item.price * item.qty).toFixed(2)}</span>
+        <span>₹${(item.price * item.qty).toFixed(2)}</span>
       `;
       receiptItems.appendChild(itEl);
     });
@@ -659,7 +659,7 @@ async function syncMentorConsole() {
             <div class="text-muted small">${o.customer_email}</div>
           </td>
           <td>${itemsHtml}</td>
-          <td><strong class="text-white">$${o.total_price.toFixed(2)}</strong></td>
+          <td><strong class="text-white">₹${o.total_price.toFixed(2)}</strong></td>
           <td>
             <div>${new Date(o.created_at).toLocaleDateString()}</div>
             <div class="text-muted small">${timeStr}</div>
@@ -753,7 +753,7 @@ function populateCustomizerDropdown() {
   products.forEach(p => {
     const opt = document.createElement('option');
     opt.value = p.id;
-    opt.textContent = `${p.name} - $${p.price.toFixed(2)}`;
+    opt.textContent = `${p.name} - ₹${p.price.toFixed(2)}`;
     select.appendChild(opt);
   });
 }
@@ -809,8 +809,8 @@ function handleAddCustomToCart() {
 
   const customColorwayName = `Bespoke (Upper: ${upperCol}, Sole: ${midsoleCol}, Laces: ${lacesCol}, Logo: ${accentsCol})`;
 
-  // Add $20 premium for custom design order
-  const customPrice = baseShoe.price + 20.00;
+  // Add ₹1,500 premium for custom design order
+  const customPrice = baseShoe.price + 1500.00;
 
   // Check if exact custom model already in cart
   const existingIndex = cart.findIndex(item => 
@@ -844,7 +844,7 @@ function handleAddCustomToCart() {
   openCartDrawer();
   
   // Quick alert overlay toast simulation
-  alert(`Bespoke ${baseShoe.name} added to shopping drawer with a +$20 custom laboratory dye premium!`);
+  alert(`Bespoke ${baseShoe.name} added to shopping drawer with a +₹1,500 custom laboratory dye premium!`);
 }
 
 // Event Listeners Mapping

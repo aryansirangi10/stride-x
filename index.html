@@ -23,7 +23,19 @@
     <div class="container-fluid px-4">
       <div class="row align-items-center justify-content-between g-2">
         <div class="col-auto">
-          <a class="navbar-brand brand" href="#">Stride<span class="highlight">X</span></a>
+          <a class="navbar-brand brand d-flex align-items-center gap-2" href="#">
+            <svg class="brand-logo" viewBox="0 0 32 32" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 22 L16 10 L26 22 L16 26 Z" fill="url(#gold-grad)" />
+              <path d="M12 20 L16 14 L20 20 L16 22 Z" fill="#08080a" />
+              <defs>
+                <linearGradient id="gold-grad" x1="6" y1="10" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#dfba73"/>
+                  <stop offset="100%" stop-color="#9a7b41"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span>Stride<span class="highlight">X</span></span>
+          </a>
         </div>
         
         <div class="col col-md-5 col-lg-4 px-lg-3 d-none d-md-block">
@@ -77,7 +89,7 @@
             <div class="hero-stats-card p-3">
               <div class="text-white small fw-bold">AeroRun 300</div>
               <div class="text-muted small">Cushion: Max Rebound</div>
-              <div class="text-accent small fw-bold mt-1">$129.99</div>
+              <div class="text-accent small fw-bold mt-1">₹10,999.00</div>
             </div>
           </div>
         </div>
@@ -162,22 +174,22 @@
               </div>
 
               <!-- Size and buy button -->
-              <div class="row g-3 align-items-end">
-                <div class="col-sm-4">
-                  <label for="cust-size" class="control-label mb-2">Size (US)</label>
-                  <select id="cust-size" class="form-select sort-select w-100">
-                    <option value="7">US 7</option>
-                    <option value="8">US 8</option>
-                    <option value="9">US 9</option>
-                    <option value="10" selected>US 10</option>
-                    <option value="11">US 11</option>
-                    <option value="12">US 12</option>
-                  </select>
-                </div>
-                <div class="col-sm-8">
-                  <button id="cust-add-to-cart" class="btn-accent w-100 py-3">Buy Bespoke Colorway</button>
-                </div>
+            <div class="row g-3 align-items-end">
+              <div class="col-sm-4">
+                <label for="cust-size" class="control-label mb-2">Size (US)</label>
+                <select id="cust-size" class="form-select sort-select w-100">
+                  <option value="7">US 7</option>
+                  <option value="8">US 8</option>
+                  <option value="9">US 9</option>
+                  <option value="10" selected>US 10</option>
+                  <option value="11">US 11</option>
+                  <option value="12">US 12</option>
+                </select>
               </div>
+              <div class="col-sm-8">
+                <button id="cust-add-to-cart" class="btn-accent w-100 py-3">Buy Bespoke Colorway (₹12,499.00)</button>
+              </div>
+            </div>
             </div>
           </div>
         </div>
@@ -191,7 +203,7 @@
           <div class="feature-card h-100">
             <div class="feature-icon">✈️</div>
             <h3 class="h5 text-white fw-bold mb-2">Express Insured Delivery</h3>
-            <p class="text-muted mb-0">Complimentary priority shipping on orders over $150. Tracked and fully insured.</p>
+            <p class="text-muted mb-0">Complimentary priority shipping on orders over ₹12,000. Tracked and fully insured.</p>
           </div>
         </div>
         <div class="col-md-4">
@@ -415,7 +427,7 @@
       <div class="shipping-tracker-wrapper px-4 pt-3 pb-2 bg-dark">
         <div class="d-flex justify-content-between text-muted small mb-1">
           <span id="shipping-tracker-text">Add items to qualify for free shipping</span>
-          <span id="shipping-tracker-milestone">$150.00</span>
+          <span id="shipping-tracker-milestone">₹12,000.00</span>
         </div>
         <div class="progress" style="height: 6px; background-color: rgba(255,255,255,0.05);">
           <div id="shipping-progress" class="progress-bar bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>

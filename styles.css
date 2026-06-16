@@ -66,6 +66,12 @@ body {
 .brand .highlight {
   color: var(--accent-color);
 }
+.brand-logo {
+  transition: transform var(--transition-normal);
+}
+.brand:hover .brand-logo {
+  transform: rotate(-15deg) scale(1.08);
+}
 
 .nav-link {
   font-weight: 500;

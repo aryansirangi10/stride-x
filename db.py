@@ -88,46 +88,46 @@ def init_db(force_reset=False):
 def seed_data(conn):
     cursor = conn.cursor()
 
-    # Product list with local image paths
+    # Product list with local image paths and Indian Rupees (INR) prices
     products = [
         (
-            "AeroRun 300", "StrideTech", "Running", 129.99,
-            "Engineered for high-performance and long-distance runs. Features a responsive nitrogen-infused foam midsole, highly breathable engineered mesh upper, and carbon-rubber traction outsole for optimal grip and shock absorption.",
+            "AeroRun 300", "StrideTech", "Running", 10999.00,
+            "An elite marathon silhouette engineered for effortless speed. Imbued with StrideTech's proprietary nitrogen-infused supercritical foam midsole, an ultra-breathable engineered knit upper, and zoned carbon-rubber outsoles for exceptional rebound and traction.",
             "/assets/images/aerorun_300.png", 4.5, 2, "7,8,9,10,11,12", "Ice White/Cobalt,Charcoal Black", 12
         ),
         (
-            "TrailMaster X", "TerraFit", "Trail", 149.99,
-            "Built for the rugged outdoors. Built with a tough water-resistant ripstop nylon upper, protective toe-bumper, and deep multi-directional outsole lugs that secure a firm foothold on mud, wet rocks, and loose dirt.",
+            "TrailMaster X", "TerraFit", "Trail", 12999.00,
+            "A rugged, waterproof all-terrain armor. Crafted with resilient ripstop cordura nylon, an abrasion-resistant toe guard, and high-density directional lugs engineered to secure an unyielding foothold on loose gravel, mud, and wet rock face.",
             "/assets/images/trailmaster_x.png", 4.5, 2, "8,9,10,11,12", "Forest Green/Amber,Stealth Black", 8
         ),
         (
-            "UrbanFlex Lo", "MetroStep", "Casual", 89.99,
-            "A sleek, minimalist low-top sneaker for everyday city wear. Crafted with premium full-grain leather, subtle stitching accents, and an anatomical memory-foam insole providing superior all-day walking comfort.",
+            "UrbanFlex Lo", "MetroStep", "Casual", 7499.00,
+            "A masterpiece of clean, urban minimalism. Handcrafted from premium full-grain Italian leather with reinforced double stitching, boasting an anatomical memory-foam insole that delivers effortless all-day comfort for the modern explorer.",
             "/assets/images/urbanflex_lo.png", 5.0, 2, "7,8,9,10,11", "Off-White/Tan,Cool Grey", 15
         ),
         (
-            "CourtPro Elite", "VolleyEdge", "Sport", 119.99,
-            "Designed for tennis, pickleball, and indoor court sports. Offers excellent lateral stability with a reinforced side wall, responsive heel gel cushioning, and a non-marking high-durability traction outsole.",
+            "CourtPro Elite", "VolleyEdge", "Sport", 9999.00,
+            "Engineered for swift, high-intensity court dynamics. Incorporates lateral stability chassis walls, shock-absorbing heel gel cavities, and a high-durability non-marking herringbone rubber grip optimized for rapid pivots and slides.",
             "/assets/images/courtpro_elite.png", 4.5, 2, "8,9,10,11,12", "Midnight Black/Neon,White/Scarlet", 10
         ),
         (
-            "ApexLift 500", "StrideTech", "Training", 139.99,
-            "Engineered specifically for heavy lifting and cross-training. Features an ultra-flat, non-compressible solid rubber sole, heel cup stability clip, and an adjustable wide midfoot hook-and-loop lockdown strap.",
+            "ApexLift 500", "StrideTech", "Training", 11499.00,
+            "The ultimate foundation for heavy powerlifting. Formulated with an absolute flat, zero-compression solid compound sole, a secure TPU heel counter, and a dual-hook-and-loop lockdown strap system for maximum force output.",
             "/assets/images/apexlift_500.png", 4.5, 2, "8,9,10,11,12", "Brushed Gold/Black,Obsidian Grey", 7
         ),
         (
-            "ZenStride Glide", "MetroStep", "Casual", 99.99,
-            "An ultra-lightweight slip-on walking shoe designed for quick wear and maximum breathability. Features a flexible stretch-knit upper, padded collar, and a cloud-like shock-absorbing EVA foam midsole.",
+            "ZenStride Glide", "MetroStep", "Casual", 8499.00,
+            "Experience weightless comfort in every stride. A premium slip-on walking model featuring an expansive stretch-knit upper for ventilation, a padded collar, and a cloud-cushion EVA foam core designed to reduce joint stress.",
             "/assets/images/zenstride_glide.png", 5.0, 2, "7,8,9,10,11,12", "Platinum Grey,Midnight Navy", 20
         ),
         (
-            "AquaDunk Hydro", "TerraFit", "Sport", 79.99,
-            "High-performance amphibious shoe built for kayaking, paddleboarding, and wet terrain. Features built-in drainage ports throughout the outsole, quick-dry hydrophobic mesh, and sticky water-grip rubber.",
+            "AquaDunk Hydro", "TerraFit", "Sport", 6999.00,
+            "The premier amphibious utility shoe. Structured with quick-drain outsole ports, an ultra-vented hydrophobic mesh weave that dries in minutes, and a sticky wet-grip rubber compound ideal for rocks and marine decks.",
             "/assets/images/aquadunk_hydro.png", 4.5, 2, "8,9,10,11", "Teal/Marine Blue,Lime Glow", 14
         ),
         (
-            "VeloSpeed Pro", "VolleyEdge", "Sport", 169.99,
-            "Premium road and indoor cycling shoe. Equipped with a stiff carbon-reinforced outsole for maximum power transfer, dual dial fit adjustment system, and compatibility with standard 3-bolt road cleats.",
+            "VeloSpeed Pro", "VolleyEdge", "Sport", 13999.00,
+            "An aerodynamic road-racing shoe engineered for maximum wattage transfer. Fitted with a rigid carbon-fiber base plate, dual micro-adjusting rotary dials for micro-fit control, and standard 3-bolt road cleat compatibility.",
             "/assets/images/velospeed_pro.png", 5.0, 2, "7,8,9,10,11,12", "Gloss White/Red,Matte Blackout", 6
         )
     ]

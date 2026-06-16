@@ -2,223 +2,477 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StrideX — Premium Footwear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrideX — Luxury Footwear & Performance Shoes</title>
   
-  <!-- Modern Font: Outfit -->
+  <!-- Premium Google Fonts: Playfair Display (Serif) & Outfit (Sans-Serif) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   
+  <!-- Custom Luxury Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="site-wrapper">
-    <!-- Navbar -->
-    <header class="site-header navbar navbar-expand-lg sticky-top">
-      <div class="container-fluid px-4">
-        <a class="navbar-brand brand" href="#">Stride<span class="highlight">X</span></a>
+
+  <!-- Header & Navigation Bar -->
+  <header class="site-header sticky-top py-2">
+    <div class="container-fluid px-4">
+      <div class="row align-items-center justify-content-between g-2">
+        <div class="col-auto">
+          <a class="navbar-brand brand" href="#">Stride<span class="highlight">X</span></a>
+        </div>
         
-        <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="col col-md-5 col-lg-4 px-lg-3 d-none d-md-block">
+          <input id="search" class="form-control search-input w-100" type="search" placeholder="Search premium collection..." aria-label="Search">
+        </div>
         
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link text-white active" aria-current="page" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-white-50" href="#shop">Shop</a></li>
-            <li class="nav-item"><a class="nav-link text-white-50" href="#features">Features</a></li>
-          </ul>
-          
-          <div class="d-flex align-items-center gap-3">
-            <input id="search" class="form-control glass-input" type="search" placeholder="Search premium shoes..." aria-label="Search">
-            <button id="cart-btn" class="btn glass-btn text-nowrap">
-              Cart <span id="cart-count" class="badge">0</span>
-            </button>
-          </div>
+        <div class="col-auto d-flex align-items-center gap-3">
+          <button id="cart-btn" class="cart-btn">
+            <span>Cart</span>
+            <span id="cart-count" class="badge">0</span>
+          </button>
         </div>
       </div>
-    </header>
-
-    <main>
-      <!-- Hero Carousel Section -->
-      <section class="hero-carousel">
-        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-          <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-          </div>
-          <div class="carousel-inner">
-            <div class="carousel-item active hero-slide">
-              <div class="hero-content">
-                <h1 class="display-3 fw-bold text-white">Step into the <span class="gradient-text">Future</span></h1>
-                <p class="lead text-light">Discover the finest selection of premium footwear engineered for performance.</p>
-                <a href="#shop" class="btn btn-primary btn-lg custom-primary mt-3">Shop Now</a>
-              </div>
-            </div>
-            <div class="carousel-item hero-slide">
-              <div class="hero-content">
-                <h1 class="display-3 fw-bold text-white">Unleash Your <span class="gradient-text">Speed</span></h1>
-                <p class="lead text-light">Experience the next generation of running dynamics with StrideX.</p>
-                <a href="#shop" class="btn btn-primary btn-lg custom-primary mt-3">Explore Collection</a>
-              </div>
-            </div>
-            <div class="carousel-item hero-slide">
-              <div class="hero-content">
-                <h1 class="display-3 fw-bold text-white">Urban <span class="gradient-text">Elegance</span></h1>
-                <p class="lead text-light">Styled for the streets. Built for your comfort.</p>
-                <a href="#shop" class="btn btn-primary btn-lg custom-primary mt-3">View New Arrivals</a>
-              </div>
-            </div>
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Features Section -->
-      <section id="features" class="container py-5 my-4">
-        <div class="row g-4 text-center">
-          <div class="col-md-4">
-            <div class="feature-card p-4 h-100 glass-panel rounded-4">
-              <div class="feature-icon mb-3 fs-1">🚀</div>
-              <h3 class="h5 text-white">Free Express Shipping</h3>
-              <p class="text-muted mb-0">On all orders over $150. Delivered in 2 days.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="feature-card p-4 h-100 glass-panel rounded-4">
-              <div class="feature-icon mb-3 fs-1">✨</div>
-              <h3 class="h5 text-white">Premium Materials</h3>
-              <p class="text-muted mb-0">Crafted with the highest quality sustainable fabrics.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="feature-card p-4 h-100 glass-panel rounded-4">
-              <div class="feature-icon mb-3 fs-1">🛡️</div>
-              <h3 class="h5 text-white">Secure Checkout</h3>
-              <p class="text-muted mb-0">100% secure payment with advanced encryption.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Shop Section -->
-      <section id="shop" class="container py-5">
-        <div class="controls d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-          <h2 class="text-white fw-bold mb-0">Our Collection</h2>
-          <div class="filters d-flex gap-2">
-            <select id="category-filter" class="form-select glass-select w-auto">
-              <option value="all">All Categories</option>
-            </select>
-            <select id="sort" class="form-select glass-select w-auto">
-              <option value="popular">Sort: Popular</option>
-              <option value="price-asc">Price: Low → High</option>
-              <option value="price-desc">Price: High → Low</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="products" class="grid"></div>
-      </section>
       
-      <!-- Testimonials -->
-      <section class="testimonials py-5 my-4">
-        <div class="container text-center">
-          <h2 class="text-white fw-bold mb-5">What Our Athletes Say</h2>
-          <div class="row g-4">
-            <div class="col-md-4">
-              <div class="testimonial-card p-4 glass-panel rounded-4 h-100 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="stars mb-3 text-warning">★★★★★</div>
-                  <p class="text-light fst-italic">"The most comfortable running shoes I've ever owned. Highly recommend!"</p>
-                </div>
-                <div class="fw-bold text-white mt-3">— Sarah J.</div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="testimonial-card p-4 glass-panel rounded-4 h-100 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="stars mb-3 text-warning">★★★★★</div>
-                  <p class="text-light fst-italic">"Incredible design and super responsive on the track. StrideX is the future."</p>
-                </div>
-                <div class="fw-bold text-white mt-3">— Mike T.</div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="testimonial-card p-4 glass-panel rounded-4 h-100 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="stars mb-3 text-warning">★★★★☆</div>
-                  <p class="text-light fst-italic">"Love the aesthetics and the fit. Perfect for my daily urban commutes."</p>
-                </div>
-                <div class="fw-bold text-white mt-3">— Emily R.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Newsletter -->
-      <section class="newsletter py-5 text-center mb-5">
-        <div class="container">
-          <div class="glass-panel rounded-4 p-5 mx-auto" style="max-width: 600px;">
-            <h2 class="text-white fw-bold mb-3">Join the StrideX Club</h2>
-            <p class="text-muted mb-4">Subscribe for exclusive drops, early access, and 10% off your first order.</p>
-            <form class="d-flex flex-column flex-sm-row gap-2">
-              <input type="email" class="form-control glass-input flex-grow-1" placeholder="Enter your email" required>
-              <button type="submit" class="btn btn-primary custom-primary px-4">Subscribe</button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <footer class="site-footer py-4 mt-auto border-top border-secondary">
-      <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-        <div class="brand fs-4 mb-3 mb-md-0">Stride<span class="highlight">X</span></div>
-        <p class="mb-0 text-muted">© 2026 StrideX. All rights reserved.</p>
-        <div class="socials mt-3 mt-md-0 d-flex gap-3 text-muted">
-          <span style="cursor:pointer" class="hover-white">Twitter</span>
-          <span style="cursor:pointer" class="hover-white">Instagram</span>
+      <!-- Mobile Search Bar (Visible only on small screens) -->
+      <div class="row mt-2 d-md-none">
+        <div class="col-12">
+          <input id="search-mobile" class="form-control search-input w-100" type="search" placeholder="Search premium collection..." aria-label="Search">
         </div>
       </div>
-    </footer>
-  </div>
+    </div>
+  </header>
 
-  <!-- Native Dialog for Product Modal -->
-  <dialog id="product-modal" class="modal-dialog-native">
-    <div class="modal-content-custom">
-      <button id="modal-close" class="close-btn">&times;</button>
-      <div id="modal-body"></div>
+  <main>
+    <!-- Hero Slider / Carousel Section -->
+    <section class="hero-carousel">
+      <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        
+        <div class="carousel-inner">
+          <!-- Slide 1 -->
+          <div class="carousel-item active hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('assets/images/aerorun_300.png');">
+            <div class="container px-4">
+              <div class="hero-content">
+                <span class="hero-badge">New Release</span>
+                <h1 class="display-3 text-white mb-3">AeroRun 300<br><span class="highlight">Marathon Dynamics</span></h1>
+                <p class="lead text-secondary mb-4">Precision-engineered with nitrogen-infused foam for ultra-responsive energy return and lightweight breathability.</p>
+                <button class="btn-accent view-hero-btn" data-id="1">Explore Release</button>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 2 -->
+          <div class="carousel-item hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('assets/images/trailmaster_x.png');">
+            <div class="container px-4">
+              <div class="hero-content">
+                <span class="hero-badge">Adventure Elite</span>
+                <h1 class="display-3 text-white mb-3">TrailMaster X<br><span class="highlight">Conquer Technical Dirt</span></h1>
+                <p class="lead text-secondary mb-4">Water-resistant ripstop nylon and multi-directional traction lugs designed to tackle mud and rocky slopes.</p>
+                <button class="btn-accent view-hero-btn" data-id="2">Explore Outdoor</button>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 3 -->
+          <div class="carousel-item hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('assets/images/apexlift_500.png');">
+            <div class="container px-4">
+              <div class="hero-content">
+                <span class="hero-badge">Premium Gym</span>
+                <h1 class="display-3 text-white mb-3">ApexLift 500<br><span class="highlight">Absolute Strength Stability</span></h1>
+                <p class="lead text-secondary mb-4">Engineered for maximum power delivery with a non-compressible sole and heavy-duty lockdown straps.</p>
+                <button class="btn-accent view-hero-btn" data-id="5">Explore Training</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Brand Trust Badges Features -->
+    <section class="container py-5 my-3">
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+          <div class="feature-card h-100">
+            <div class="feature-icon">✈️</div>
+            <h3 class="h5 text-white fw-bold mb-2">Express Insured Delivery</h3>
+            <p class="text-muted mb-0">Complimentary priority shipping on orders over $150. Tracked and fully insured.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card h-100">
+            <div class="feature-icon">✨</div>
+            <h3 class="h5 text-white fw-bold mb-2">Sustainable Materials</h3>
+            <p class="text-muted mb-0">Crafted with ethically-sourced materials, reducing our carbon footprint without sacrificing performance.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card h-100">
+            <div class="feature-icon">🛡️</div>
+            <h3 class="h5 text-white fw-bold mb-2">Secure Encrypted Checkout</h3>
+            <p class="text-muted mb-0">Your financial details are securely processed with 256-bit encryption for safe, worry-free shopping.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shop Catalog Section -->
+    <section id="shop" class="container py-5 border-top border-secondary-subtle">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center mb-5 gap-4">
+        <div>
+          <h2 class="h1 text-white fw-light mb-1" style="font-family: var(--font-serif);">The Collection</h2>
+          <p class="text-muted mb-0">Browse and sort through our premium range of engineered athletic models.</p>
+        </div>
+        
+        <!-- Controls: User-Friendly Tabs & Sort Dropdown -->
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+          <div id="category-tabs" class="category-tabs">
+            <button class="tab-btn active" data-category="all">All Models</button>
+            <button class="tab-btn" data-category="Running">Running</button>
+            <button class="tab-btn" data-category="Trail">Trail</button>
+            <button class="tab-btn" data-category="Casual">Casual</button>
+            <button class="tab-btn" data-category="Sport">Sport</button>
+            <button class="tab-btn" data-category="Training">Training</button>
+          </div>
+          
+          <select id="sort" class="form-select sort-select w-auto">
+            <option value="popular">Sort: Featured</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamic Grid Container -->
+      <div id="products" class="products-grid">
+        <!-- Rendered via app.js -->
+        <div class="text-center w-100 py-5">
+          <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading collection...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="container py-5 my-4 border-top border-secondary-subtle text-center">
+      <h2 class="text-white fw-light mb-5" style="font-family: var(--font-serif);">Athlete Endorsements</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="feature-card h-100 d-flex flex-column justify-content-between">
+            <div class="mb-4">
+              <div class="stars-display fs-5 mb-2">★★★★★</div>
+              <p class="text-light fst-italic">"The foam rebound on the AeroRun series is unmatched. It cushions joint impacts without absorbing force. Truly outstanding design."</p>
+            </div>
+            <div class="fw-bold text-white fs-6">— Sarah Jenkins (Running Coach)</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card h-100 d-flex flex-column justify-content-between">
+            <div class="mb-4">
+              <div class="stars-display fs-5 mb-2">★★★★★</div>
+              <p class="text-light fst-italic">"I've climbed wet mountain ascents in the TrailMaster X. The rubber lugs grip like rock cleats. I will never buy another hiking model."</p>
+            </div>
+            <div class="fw-bold text-white fs-6">— David K. (Trail Athlete)</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card h-100 d-flex flex-column justify-content-between">
+            <div class="mb-4">
+              <div class="stars-display fs-5 mb-2">★★★★★</div>
+              <p class="text-light fst-italic">"Clean lines and incredible cushioning. The UrbanFlex Lo fits like a tailored glove, keeping me comfortable on 10,000-step city tours."</p>
+            </div>
+            <div class="fw-bold text-white fs-6">— Julian S. (Style Consultant)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter Drop Signup -->
+    <section class="newsletter py-5 text-center mb-5">
+      <div class="container">
+        <div class="feature-card rounded-4 p-5 mx-auto" style="max-width: 650px; background-color: var(--bg-surface-elevated);">
+          <h2 class="text-white fw-light mb-3" style="font-family: var(--font-serif);">Join the StrideX Club</h2>
+          <p class="text-muted mb-4">Receive priority notifications for limited edition releases, early athlete drops, and exclusive club pricing.</p>
+          <form class="d-flex flex-column flex-sm-row gap-2 justify-content-center" onsubmit="event.preventDefault(); alert('Thank you for subscribing to StrideX notifications!');">
+            <input type="email" class="form-control search-input flex-grow-1" style="max-width: 360px;" placeholder="Enter your email address" required>
+            <button type="submit" class="btn-accent px-4 text-nowrap">Request Invitation</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer py-4 border-top border-secondary">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div class="brand fs-4">Stride<span class="highlight">X</span></div>
+      <p class="mb-0 text-muted" style="font-size: 13.5px;">© 2026 StrideX Footwear. Designed for mentors evaluation.</p>
+      <div class="socials d-flex gap-3 text-muted" style="font-size: 13.5px;">
+        <span style="cursor:pointer" class="hover-white">Twitter</span>
+        <span style="cursor:pointer" class="hover-white">Instagram</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Native Dialog: Product Details Sheet -->
+  <dialog id="product-modal">
+    <div class="detail-modal-container">
+      <button id="modal-close" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      <div class="detail-grid">
+        <div class="detail-img-wrapper">
+          <img id="detail-img" src="" alt="">
+        </div>
+        <div class="detail-content-wrapper d-flex flex-column">
+          <div class="mb-2">
+            <span id="detail-brand" class="product-brand d-block mt-0 mb-1"></span>
+            <h2 id="detail-name" class="h3 text-white fw-normal" style="font-family: var(--font-serif);"></h2>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <span id="detail-stars" class="stars-display"></span>
+              <span id="detail-reviews-count" class="text-muted small"></span>
+            </div>
+          </div>
+          
+          <div id="detail-price" class="h4 text-white fw-bold my-2"></div>
+          
+          <p id="detail-desc" class="text-muted mb-3" style="font-size: 14px;"></p>
+          
+          <div class="mb-3">
+            <label class="text-muted small fw-bold text-uppercase d-block mb-1">Select Size (US)</label>
+            <div id="detail-sizes" class="size-grid"></div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="text-muted small fw-bold text-uppercase d-block mb-1">Select Colorway</label>
+            <div id="detail-colors" class="color-swatches"></div>
+          </div>
+
+          <div class="mt-2 mb-3">
+            <span id="detail-stock" class="small fw-semibold"></span>
+          </div>
+
+          <button id="modal-add-btn" class="btn-accent w-100 py-3 mt-auto">Add to Cart</button>
+          
+          <!-- Detailed Information Tabs -->
+          <div class="modal-tabs">
+            <button class="modal-tab-trigger active" data-tab="tab-reviews">Reviews</button>
+            <button class="modal-tab-trigger" data-tab="tab-specs">Technical Specifications</button>
+          </div>
+          
+          <div class="modal-tab-content">
+            <!-- Reviews Pane -->
+            <div id="tab-reviews" class="modal-tab-pane active">
+              <div id="detail-reviews-list" class="mb-4">
+                <!-- User reviews loaded dynamically -->
+              </div>
+              
+              <!-- Review Submission Form -->
+              <form id="review-form" class="review-form">
+                <h4 class="h6 text-white mb-3">Submit Professional Review</h4>
+                <div class="row g-2 mb-2">
+                  <div class="col-sm-8">
+                    <label for="review-name">Full Name</label>
+                    <input type="text" id="review-name" class="checkout-input" placeholder="e.g. Coach Smith" required>
+                  </div>
+                  <div class="col-sm-4">
+                    <label for="review-rating">Rating</label>
+                    <select id="review-rating" class="form-select sort-select w-100">
+                      <option value="5">5 Stars</option>
+                      <option value="4">4 Stars</option>
+                      <option value="3">3 Stars</option>
+                      <option value="2">2 Stars</option>
+                      <option value="1">1 Star</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label for="review-comment">Review Comment</label>
+                  <textarea id="review-comment" class="checkout-input" rows="3" placeholder="Provide details about performance, comfort, fit, and styling..." required></textarea>
+                </div>
+                <button type="submit" class="btn-accent w-100 py-2">Publish Review</button>
+              </form>
+            </div>
+            
+            <!-- Specs Pane -->
+            <div id="tab-specs" class="modal-tab-pane">
+              <div class="small text-muted">
+                <table class="table table-dark table-borderless mb-0">
+                  <tbody>
+                    <tr><td class="ps-0 py-1 text-secondary">Manufacturer</td><td class="py-1 text-white text-end" id="spec-brand"></td></tr>
+                    <tr><td class="ps-0 py-1 text-secondary">Material Grade</td><td class="py-1 text-white text-end">Premium Recycled Poly / Fine Leather</td></tr>
+                    <tr><td class="ps-0 py-1 text-secondary">Midsole Tech</td><td class="py-1 text-white text-end">Anatomical Shock Rebound</td></tr>
+                    <tr><td class="ps-0 py-1 text-secondary">Fit Grade</td><td class="py-1 text-white text-end">True to Size (Standard Width)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </dialog>
 
-  <!-- Native Dialog for Slide-out Cart -->
-  <dialog id="cart-modal" class="side-drawer">
-    <div class="drawer-header">
-      <h2 class="h4 mb-0 text-white fw-bold">Your Cart</h2>
-      <button id="cart-close" class="close-btn">&times;</button>
-    </div>
-    <div id="cart-items" class="drawer-body"></div>
-    <div class="drawer-footer">
-      <div id="cart-total" class="total-price text-white fw-bold d-flex justify-content-between"></div>
-      <button id="checkout" class="btn btn-primary custom-primary w-100 mt-3">Proceed to Checkout</button>
+  <!-- Native Dialog: Slide-out Cart Panel -->
+  <dialog id="cart-modal">
+    <div class="side-drawer">
+      <div class="drawer-header">
+        <h2 class="h4 mb-0 text-white fw-bold" style="font-family: var(--font-serif);">Shopping Drawer</h2>
+        <button id="cart-close" class="modal-close-btn">&times;</button>
+      </div>
+      
+      <div id="cart-items" class="drawer-body">
+        <!-- Rendered dynamically -->
+      </div>
+      
+      <div class="drawer-footer">
+        <div id="cart-pricing" class="d-flex flex-column gap-2 mb-4">
+          <!-- Pricing summary rows rendered dynamically -->
+        </div>
+        <button id="checkout" class="btn-accent w-100 py-3">Secure Checkout</button>
+      </div>
     </div>
   </dialog>
+
+  <!-- Native Dialog: Elegant Checkout Form -->
+  <dialog id="checkout-modal">
+    <div class="checkout-modal-card">
+      <button id="checkout-close" class="modal-close-btn">&times;</button>
+      <h2 class="h4 text-white fw-bold mb-1" style="font-family: var(--font-serif);">Express Payment</h2>
+      <p class="text-muted small mb-4">Enter shipping details and test card credentials to submit checkout order.</p>
+      
+      <form id="checkout-form" class="checkout-grid">
+        <div class="mb-1">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Customer Name</label>
+          <input type="text" id="cust-name" class="checkout-input" placeholder="e.g. John Doe" required>
+        </div>
+        <div class="mb-1">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Email Address</label>
+          <input type="email" id="cust-email" class="checkout-input" placeholder="e.g. john@domain.com" required>
+        </div>
+        <div class="mb-1">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Shipping Address</label>
+          <input type="text" id="cust-address" class="checkout-input" placeholder="e.g. 123 Luxury Ave, New York, NY" required>
+        </div>
+        
+        <!-- Credit Card Fields simulator -->
+        <div class="border-top border-secondary pt-3 mt-2">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-2">Card Details (Demo Mode)</label>
+          <div class="mb-2">
+            <input type="text" id="card-number" class="checkout-input" placeholder="4111 2222 3333 4444" maxlength="19" required>
+          </div>
+          <div class="cc-group">
+            <input type="text" id="card-expiry" class="checkout-input" placeholder="MM/YY" maxlength="5" required>
+            <input type="password" id="card-cvc" class="checkout-input" placeholder="CVC" maxlength="3" required>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-accent w-100 py-3 mt-3">Finalize Order</button>
+      </form>
+      
+      <!-- Confirmation receipt display -->
+      <div id="checkout-success" class="receipt-wrapper d-none">
+        <div class="success-icon">✓</div>
+        <h3 class="h4 text-white fw-bold">Order Confirmed!</h3>
+        <p class="text-muted small">Your payment was successful and stock has been logged.</p>
+        
+        <div class="receipt-box">
+          <div class="mb-1"><strong>Order ID:</strong> <span id="rec-id"></span></div>
+          <div class="mb-1"><strong>Total Paid:</strong> <span id="rec-total"></span></div>
+          <div class="mb-2"><strong>Ship To:</strong> <span id="rec-name"></span> (<span id="rec-email"></span>)</div>
+          <hr class="border-secondary my-2">
+          <div id="rec-items"></div>
+        </div>
+        <button id="checkout-done-btn" class="btn-accent w-100 py-2">Continue Shopping</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Collapsible Mentor Console Section -->
+  <section class="mentor-console">
+    <div id="mentor-console-trigger" class="mentor-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fs-6">🖥️</span>
+        <span class="h6 text-white mb-0 fw-semibold">Mentor Console</span>
+        <span class="console-badge">SQLite Active</span>
+      </div>
+      <span id="mentor-console-arrow" class="text-muted small" style="transform: rotate(0deg); transition: transform 0.3s;">▲</span>
+    </div>
+    
+    <div id="mentor-console-body" class="mentor-body">
+      <div class="row g-4">
+        <!-- SQLite Table 1: Active Orders -->
+        <div class="col-lg-7">
+          <h3 class="h6 text-white fw-bold mb-3 d-flex justify-content-between align-items-center">
+            <span>SQLite Database: <code>orders</code> & <code>order_items</code></span>
+            <span class="badge bg-secondary">Real-Time Sync</span>
+          </h3>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Info</th>
+                  <th>Purchased Shoe Details</th>
+                  <th>Total Invoice</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <tr><td colspan="5" class="text-center text-muted py-4">No transactions processed in database yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- SQLite Table 2: Product Catalog & Reviews logs -->
+        <div class="col-lg-5">
+          <h3 class="h6 text-white fw-bold mb-3 d-flex justify-content-between align-items-center">
+            <span>SQLite Database: <code>products</code> & <code>reviews</code></span>
+            <span class="badge bg-secondary">Catalog Stock</span>
+          </h3>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Shoe Model</th>
+                  <th>Sizes Available</th>
+                  <th>Rating</th>
+                  <th>Stock Count</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <p class="text-muted small mb-0">Use the control button to reset SQLite to seeded defaults.</p>
+            <button id="reset-db-btn" class="btn-reset-db">Reset Database File</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="app.js" defer></script>
+  
+  <!-- Custom E-Commerce Logic -->
+  <script src="app.js"></script>
 </body>
 </html>

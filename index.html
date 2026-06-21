@@ -38,24 +38,52 @@
           </a>
         </div>
         
-        <div class="col col-md-5 col-lg-4 px-lg-3 d-none d-md-block">
-          <input id="search" class="form-control search-input w-100" type="search" placeholder="Search the collection..." aria-label="Search">
+        <div class="col col-md-5 col-lg-4 px-lg-3 d-none d-md-block position-relative">
+          <input id="search" class="form-control search-input w-100" type="search" placeholder="Search the collection..." aria-label="Search" autocomplete="off">
+          <div id="search-suggestions" class="search-suggestions d-none"></div>
         </div>
         
-        <div class="col-auto d-flex align-items-center gap-3">
+        <div class="col-auto d-flex align-items-center gap-2 gap-md-3">
+          <!-- Theme Toggle Switcher -->
+          <button id="theme-toggle-btn" class="cart-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <span id="theme-icon">☀️</span>
+          </button>
           <a href="#bespoke-lab" class="nav-link d-none d-lg-inline-block text-uppercase small fw-bold tracking-wider" style="color: var(--accent-color) !important;">Bespoke Lab</a>
           <a href="#shop" class="nav-link d-none d-lg-inline-block text-uppercase small fw-bold tracking-wider">Catalog</a>
+          
+          <!-- Wishlist counter trigger -->
+          <button id="wishlist-btn" class="cart-btn" title="View Wishlist">
+            <span>❤️</span>
+            <span id="wishlist-count" class="badge">0</span>
+          </button>
+
           <button id="cart-btn" class="cart-btn">
             <span>Cart</span>
             <span id="cart-count" class="badge">0</span>
           </button>
+          <!-- User Authentication Profile Trigger -->
+          <div class="position-relative" id="user-menu-wrapper">
+            <button id="auth-btn" class="cart-btn">
+              <span id="auth-btn-text">Sign In</span>
+            </button>
+            <ul class="auth-dropdown-menu" id="auth-dropdown" style="display: none;">
+              <li><div class="dropdown-header text-accent fw-bold px-3 py-2" id="user-profile-title" style="color: var(--accent-color);">Guest User</div></li>
+              <li><hr class="border-secondary my-1"></li>
+              <li><a class="dropdown-item py-2 px-3 text-white text-decoration-none d-block" href="#" id="view-profile-btn">👤 My Profile</a></li>
+              <li><a class="dropdown-item py-2 px-3 text-white text-decoration-none d-block" href="#" id="view-orders-btn">📦 Track Orders</a></li>
+              <li><a class="dropdown-item py-2 px-3 text-white text-decoration-none d-block" href="#" id="view-compare-btn">⚖️ Compare (<span id="compare-badge-count">0</span>)</a></li>
+              <li><hr class="border-secondary my-1"></li>
+              <li><a class="dropdown-item py-2 px-3 text-danger text-decoration-none d-block" href="#" id="logout-btn">Log Out</a></li>
+            </ul>
+          </div>
         </div>
       </div>
       
       <!-- Mobile Search Bar -->
       <div class="row mt-2 d-md-none">
-        <div class="col-12">
-          <input id="search-mobile" class="form-control search-input w-100" type="search" placeholder="Search the collection..." aria-label="Search">
+        <div class="col-12 position-relative">
+          <input id="search-mobile" class="form-control search-input w-100" type="search" placeholder="Search the collection..." aria-label="Search" autocomplete="off">
+          <div id="search-suggestions-mobile" class="search-suggestions d-none"></div>
         </div>
       </div>
     </div>
@@ -250,11 +278,95 @@
         </div>
       </div>
 
-      <!-- Dynamic Grid Container -->
-      <div id="products" class="products-grid">
-        <div class="text-center w-100 py-5">
-          <div class="spinner-border text-warning" role="status">
-            <span class="visually-hidden">Loading collection...</span>
+      <!-- Sidebar Filters and Products Layout -->
+      <div class="row g-4">
+        <!-- Sidebar Filter controls -->
+        <aside class="col-lg-3">
+          <button class="btn-accent w-100 d-lg-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filters-collapse" aria-expanded="false" aria-controls="filters-collapse">
+            Toggle Filter Options
+          </button>
+          <div class="collapse d-lg-block filters-wrapper p-4" id="filters-collapse">
+            <h3 class="h6 text-white text-uppercase tracking-wider fw-bold mb-4">🎛️ Advanced Filters</h3>
+            
+            <!-- Filter by Brand -->
+            <div class="mb-4">
+              <label class="control-label mb-2 d-block">Brand</label>
+              <div class="d-flex flex-column gap-2" id="brand-filters">
+                <label class="filter-checkbox-label d-flex align-items-center gap-2 text-muted small">
+                  <input type="checkbox" class="brand-checkbox" value="StrideTech" checked> StrideTech
+                </label>
+                <label class="filter-checkbox-label d-flex align-items-center gap-2 text-muted small">
+                  <input type="checkbox" class="brand-checkbox" value="TerraFit" checked> TerraFit
+                </label>
+                <label class="filter-checkbox-label d-flex align-items-center gap-2 text-muted small">
+                  <input type="checkbox" class="brand-checkbox" value="MetroStep" checked> MetroStep
+                </label>
+                <label class="filter-checkbox-label d-flex align-items-center gap-2 text-muted small">
+                  <input type="checkbox" class="brand-checkbox" value="VolleyEdge" checked> VolleyEdge
+                </label>
+              </div>
+            </div>
+
+            <!-- Filter by Price Slider -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <label class="control-label">Max Price</label>
+                <span class="text-accent fw-bold small" id="price-slider-value">₹15,000</span>
+              </div>
+              <input type="range" class="form-range custom-range" id="price-range" min="6000" max="15000" step="500" value="15000">
+            </div>
+
+            <!-- Filter by Size -->
+            <div class="mb-4">
+              <label class="control-label mb-2 d-block">Available Sizes</label>
+              <div class="filter-sizes-grid">
+                <button class="filter-size-btn active" data-size="all">All</button>
+                <button class="filter-size-btn" data-size="7">7</button>
+                <button class="filter-size-btn" data-size="8">8</button>
+                <button class="filter-size-btn" data-size="9">9</button>
+                <button class="filter-size-btn" data-size="10">10</button>
+                <button class="filter-size-btn" data-size="11">11</button>
+                <button class="filter-size-btn" data-size="12">12</button>
+              </div>
+            </div>
+
+            <!-- Filter by Color -->
+            <div class="mb-4">
+              <label class="control-label mb-2 d-block">Colorway</label>
+              <div class="filter-colors-grid">
+                <button class="filter-color-btn active" data-color="all" title="All Colors" style="background: linear-gradient(45deg, red, green, blue);"></button>
+                <button class="filter-color-btn" data-color="White" title="White" style="background-color: #ffffff;"></button>
+                <button class="filter-color-btn" data-color="Black" title="Black" style="background-color: #121317;"></button>
+                <button class="filter-color-btn" data-color="Green" title="Green" style="background-color: #2a4736;"></button>
+                <button class="filter-color-btn" data-color="Blue" title="Blue" style="background-color: #1e3a8a;"></button>
+                <button class="filter-color-btn" data-color="Gold" title="Gold" style="background-color: #dfba73;"></button>
+              </div>
+            </div>
+            
+            <button class="btn-secondary-custom w-100 py-2 mt-2" id="clear-filters-btn">Reset Filters</button>
+          </div>
+        </aside>
+
+        <!-- Product Grid Area -->
+        <div class="col-lg-9">
+          <!-- AI Advisor Banner Widget -->
+          <div class="ai-advisor-banner mb-4 p-4 rounded-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+              <div class="ai-sparkle-icon fs-3">✨</div>
+              <div>
+                <h4 class="text-white h6 mb-1 fw-bold">StrideX AI Styling Advisor</h4>
+                <p class="text-muted small mb-0">Get bespoke shoe styling matches tailored dynamically to your selections.</p>
+              </div>
+            </div>
+            <button class="btn-accent py-2 px-3 small" id="ai-advisor-trigger">Ask Advisor</button>
+          </div>
+          
+          <div id="products" class="products-grid">
+            <div class="text-center w-100 py-5">
+              <div class="spinner-border text-warning" role="status">
+                <span class="visually-hidden">Loading collection...</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -356,7 +468,11 @@
             <span id="detail-stock" class="small fw-semibold"></span>
           </div>
 
-          <button id="modal-add-btn" class="btn-accent w-100 py-3 mt-auto">Add to Cart</button>
+          <div class="d-flex gap-2 mt-auto">
+            <button id="modal-add-btn" class="btn-accent flex-grow-1 py-3">Add to Cart</button>
+            <button id="modal-compare-btn" class="btn-secondary-custom py-3 px-3" title="Add to Compare">⚖️</button>
+            <button id="modal-wishlist-btn" class="btn-secondary-custom py-3 px-3" title="Add to Wishlist">❤️</button>
+          </div>
           
           <!-- Detailed Information Tabs -->
           <div class="modal-tabs">
@@ -454,6 +570,20 @@
     </div>
   </dialog>
 
+  <!-- Native Dialog: Slide-out Wishlist Drawer Panel -->
+  <dialog id="wishlist-modal">
+    <div class="side-drawer">
+      <div class="drawer-header">
+        <h2 class="h4 mb-0 text-white fw-bold" style="font-family: var(--font-serif);">Saved Wishlist</h2>
+        <button id="wishlist-close" class="modal-close-btn">&times;</button>
+      </div>
+      
+      <div id="wishlist-items" class="drawer-body">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </dialog>
+
   <!-- Native Dialog: Elegant Checkout Form -->
   <dialog id="checkout-modal">
     <div class="checkout-modal-card">
@@ -506,6 +636,216 @@
         <button id="checkout-done-btn" class="btn-accent w-100 py-2">Continue Shopping</button>
       </div>
     </div>
+  </dialog>
+
+  <!-- User Authentication Modal -->
+  <dialog id="auth-modal">
+    <div class="auth-modal-card">
+      <button id="auth-close" class="modal-close-btn">&times;</button>
+      <h2 class="h4 text-white fw-bold mb-1" style="font-family: var(--font-serif);">Bespoke Profile Access</h2>
+      <p class="text-muted small mb-4">Access limited edition collections and track custom orders.</p>
+      
+      <!-- Social Signin Options -->
+      <div class="d-flex flex-column gap-2 mb-3">
+        <button type="button" class="btn-social-signin google-btn" id="google-login-btn">
+          <svg class="me-2" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+        <button type="button" class="btn-social-signin apple-btn" id="apple-login-btn">
+          <svg class="me-2" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.98.98.08 2.13-.58 2.98-1.42z"/>
+          </svg>
+          Continue with Apple
+        </button>
+      </div>
+
+      <div class="auth-divider text-muted mb-3"><span>or use email</span></div>
+      
+      <form id="auth-form" class="auth-grid">
+        <div class="mb-3">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Email Address</label>
+          <input type="email" id="auth-email" class="checkout-input" placeholder="e.g. john@domain.com" required>
+        </div>
+        <div class="mb-3">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Password</label>
+          <input type="password" id="auth-password" class="checkout-input" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-accent w-100 py-3 mt-2" id="auth-submit-btn">Login to Account</button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- User Profile Modal -->
+  <dialog id="profile-modal">
+    <div class="profile-modal-card">
+      <button id="profile-close" class="modal-close-btn">&times;</button>
+      <h2 class="h4 text-white fw-bold mb-1" style="font-family: var(--font-serif);">Bespoke Profile</h2>
+      <p class="text-muted small mb-4">Manage your luxury account details and preferences.</p>
+      
+      <form id="profile-form" class="profile-grid">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div class="profile-avatar-wrapper">
+            <img id="profile-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150" alt="Avatar">
+          </div>
+          <div>
+            <h3 class="h5 text-white mb-0" id="profile-name-display">Guest</h3>
+            <span class="text-accent small" id="profile-role-display">Exclusive Member</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Full Name</label>
+          <input type="text" id="profile-name" class="checkout-input" placeholder="Your Name" required>
+        </div>
+        <div class="mb-3">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Default Shipping Address</label>
+          <input type="text" id="profile-address" class="checkout-input" placeholder="Default Address" required>
+        </div>
+        <div class="mb-3">
+          <label class="text-muted small fw-bold text-uppercase d-block mb-1">Bespoke Size (US)</label>
+          <select id="profile-size" class="form-select sort-select w-100">
+            <option value="7">US 7</option>
+            <option value="8">US 8</option>
+            <option value="9">US 9</option>
+            <option value="10">US 10</option>
+            <option value="11">US 11</option>
+            <option value="12">US 12</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-accent w-100 py-3 mt-2">Save Profile Updates</button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Floating Product Comparison Bar -->
+  <div id="compare-bar" class="compare-bar shadow-lg d-none">
+    <div class="container d-flex justify-content-between align-items-center h-100 py-2">
+      <div class="d-flex align-items-center gap-3">
+        <span class="fw-bold text-white text-uppercase tracking-wider small">⚖️ Product Compare</span>
+        <div id="compare-thumbnails" class="d-flex gap-2"></div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <button id="compare-trigger-btn" class="btn-accent py-2 px-4 text-nowrap">Compare (<span id="compare-btn-count">0</span>)</button>
+        <button id="compare-clear-btn" class="btn-secondary-custom py-2 px-3">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Matrix Modal -->
+  <dialog id="compare-modal">
+    <div class="compare-modal-card">
+      <button id="compare-close" class="modal-close-btn">&times;</button>
+      <h2 class="h4 text-white fw-bold mb-4" style="font-family: var(--font-serif);">Bespoke Model Comparison</h2>
+      <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle compare-table text-center">
+          <thead>
+            <tr id="compare-table-head">
+              <!-- Rendered dynamically -->
+            </tr>
+          </thead>
+          <tbody id="compare-table-body">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Order Tracking Modal -->
+  <dialog id="tracking-modal">
+    <div class="tracking-modal-card">
+      <button id="tracking-close" class="modal-close-btn">&times;</button>
+      <h2 class="h4 text-white fw-bold mb-1" style="font-family: var(--font-serif);">Bespoke Order Status</h2>
+      <p class="text-muted small mb-4">Track the live progress of your custom footwear production.</p>
+      
+      <div id="tracking-content">
+        <!-- Dynamically rendered visual timeline tracker -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Order List Modal -->
+  <dialog id="orders-list-modal">
+    <div class="orders-list-modal-card">
+      <button id="orders-list-close" class="modal-close-btn">&times;</button>
+      <h2 class="h4 text-white fw-bold mb-4" style="font-family: var(--font-serif);">Your Order History</h2>
+      <div id="orders-list-content">
+        <!-- Dynamically rendered orders list -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- FAQ Section -->
+  <section class="container py-5 my-4 border-top border-secondary-subtle">
+    <h2 class="text-center text-white fw-light mb-5" style="font-family: var(--font-serif);">Frequently Asked Questions</h2>
+    <div class="accordion accordion-flush mx-auto" id="faqAccordion" style="max-width: 800px;">
+      <div class="accordion-item bg-transparent border-bottom border-secondary">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-transparent text-white border-0 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1">
+            How does the Bespoke Sneaker Lab custom dye premium work?
+          </button>
+        </h2>
+        <div id="faq-1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted py-3">
+            Each custom order is hand-dyed by artisans in our bespoke laboratory. A flat +₹1,500 premium is added to the base silhouette price to cover specialized compound dyes, nitrogen finishing treatments, and custom inspection.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item bg-transparent border-bottom border-secondary">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-transparent text-white border-0 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2">
+            How long does delivery take for custom lab models?
+          </button>
+        </h2>
+        <div id="faq-2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted py-3">
+            Bespoke models require 3-5 business days for fabrication, curing, and drying. Once finalized, they are shipped via insured priority air delivery, arriving in 1-2 days. You can track this live in your Order History.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item bg-transparent border-bottom border-secondary">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-transparent text-white border-0 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3">
+            Can I return or exchange custom-colored shoes?
+          </button>
+        </h2>
+        <div id="faq-3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted py-3">
+            Because custom silhouettes are individually crafted to your dye specifications and sizing choice, we do not accept returns. However, we do offer a Fit Guarantee—if they do not fit, we will alter them free of charge.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Floating Live Support Widget -->
+  <div id="support-widget" class="support-widget">
+    <button id="support-toggle" class="support-toggle-btn shadow-lg">
+      💬 Styling Chat
+    </button>
+    <div id="support-chat" class="support-chat-container d-none">
+      <div class="support-chat-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <span class="status-dot"></span>
+          <span class="fw-bold text-white small">StrideX Styling Advisor</span>
+        </div>
+        <button id="support-chat-close" class="modal-close-btn" style="position: static; font-size: 16px; width: 24px; height: 24px;">&times;</button>
+      </div>
+      <div id="support-chat-body" class="support-chat-body">
+        <div class="chat-msg bot">Hello! I am your StrideX AI Styling Advisor. How can I help you customize your bespoke colorways today?</div>
+      </div>
+      <form id="support-chat-form" class="support-chat-footer d-flex gap-2">
+        <input type="text" id="support-chat-input" class="checkout-input flex-grow-1 py-2 px-3" style="font-size: 13px;" placeholder="Ask about sizes or specs..." required>
+        <button type="submit" class="btn-accent py-1 px-3">Send</button>
+      </form>
+    </div>
+  </div>
+
   </dialog>
 
   <!-- Collapsible Mentor Console Section -->

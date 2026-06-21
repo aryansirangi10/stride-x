@@ -188,7 +188,7 @@ def checkout():
         # Insert Order
         cursor.execute('''
         INSERT INTO orders (customer_name, customer_email, total_price, status)
-        VALUES (?, ?, ?, 'Completed')
+        VALUES (?, ?, ?, 'Processing')
         ''', (customer_name, customer_email, total_price))
         order_id = cursor.lastrowid
 
@@ -249,6 +249,44 @@ def get_orders():
 
         return jsonify(orders)
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/orders/<int:order_id>/status', methods=['PUT'])
+def update_order_status(order_id):
+    data = request.get_json() or {}
+    status = data.get('status')
+    if not status:
+        return jsonify({"error": "Status is required"}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+        conn.commit()
+        return jsonify({"success": True, "message": f"Order status updated to {status}"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/products/<int:product_id>/stock', methods=['PUT'])
+def update_product_stock(product_id):
+    data = request.get_json() or {}
+    stock = data.get('stock')
+    if stock is None:
+        return jsonify({"error": "Stock value is required"}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE products SET stock = ? WHERE id = ?", (int(stock), product_id))
+        conn.commit()
+        return jsonify({"success": True, "message": f"Product stock updated to {stock}"})
+    except Exception as e:
+        conn.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()

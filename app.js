@@ -5,12 +5,27 @@ const $ = id => document.getElementById(id);
 // Application State
 let products = [];
 let cart = JSON.parse(localStorage.getItem('stridex_cart') || '[]');
+let wishlist = JSON.parse(localStorage.getItem('stridex_wishlist') || '[]');
+let activeTheme = localStorage.getItem('stridex_theme') || 'dark';
+
 let activeCategory = 'all';
 let activeSort = 'popular';
 let searchQuery = '';
 let currentProduct = null;
 let selectedSize = null;
 let selectedColor = null;
+
+// Advanced Filters State
+let activeBrands = ['StrideTech', 'TerraFit', 'MetroStep', 'VolleyEdge'];
+let activeMaxPrice = 15000;
+let activeSizeFilter = 'all';
+let activeColorFilter = 'all';
+
+// Compare State
+let compareList = [];
+
+// Authentication User Session State
+let currentUser = JSON.parse(localStorage.getItem('stridex_user') || 'null');
 
 // Bespoke Customizer State
 let activeCustomizerPart = 'shoe-upper';
@@ -38,12 +53,53 @@ const colorNames = {
 
 // Initialization
 window.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   wireEventListeners();
   loadProducts();
   updateCartUI();
+  updateWishlistUI();
+  initAuthUI();
+  updateCompareUI();
   syncMentorConsole();
   setupCustomizerDefaultColors();
+  setupStripeCardInputs();
 });
+
+// Theme Management
+function initTheme() {
+  if (activeTheme === 'light') {
+    document.body.classList.add('light-theme');
+    $('theme-icon').textContent = '🌙';
+  } else {
+    document.body.classList.remove('light-theme');
+    $('theme-icon').textContent = '☀️';
+  }
+}
+
+function toggleTheme() {
+  if (activeTheme === 'dark') {
+    activeTheme = 'light';
+  } else {
+    activeTheme = 'dark';
+  }
+  localStorage.setItem('stridex_theme', activeTheme);
+  initTheme();
+}
+
+// User Session UI Initialization
+function initAuthUI() {
+  const dropdown = $('auth-dropdown');
+  const btnText = $('auth-btn-text');
+  const profileTitle = $('user-profile-title');
+
+  if (currentUser) {
+    btnText.textContent = `Hi, ${currentUser.name.split(' ')[0]}`;
+    profileTitle.textContent = currentUser.email;
+  } else {
+    btnText.textContent = 'Sign In';
+    profileTitle.textContent = 'Guest User';
+  }
+}
 
 // Fetch products from database API with search, filter, and sort options
 async function loadProducts() {
@@ -66,8 +122,8 @@ async function loadProducts() {
     if (!res.ok) throw new Error('Failed to load products');
     products = await res.json();
     
-    renderProducts(products);
-    populateCustomizerDropdown();
+    // Apply client-side multi-facet filters
+    applyClientFilters();
   } catch (err) {
     console.error(err);
     productsContainer.innerHTML = `
@@ -76,6 +132,30 @@ async function loadProducts() {
       </div>
     `;
   }
+}
+
+// Client Side Filter Processing
+function applyClientFilters() {
+  let filtered = products;
+
+  // Filter by Brand checkbox selections
+  filtered = filtered.filter(p => activeBrands.includes(p.brand));
+
+  // Filter by Max Price
+  filtered = filtered.filter(p => p.price <= activeMaxPrice);
+
+  // Filter by Size availability
+  if (activeSizeFilter !== 'all') {
+    filtered = filtered.filter(p => p.sizes.split(',').includes(activeSizeFilter));
+  }
+
+  // Filter by Color options
+  if (activeColorFilter !== 'all') {
+    filtered = filtered.filter(p => p.colors.toLowerCase().includes(activeColorFilter.toLowerCase()));
+  }
+
+  renderProducts(filtered);
+  populateCustomizerDropdown();
 }
 
 // Render product grid
@@ -236,6 +316,19 @@ async function openProductModal(productId) {
       stockEl.style.color = '#10b981';
       $('modal-add-btn').disabled = false;
       $('modal-add-btn').textContent = 'Add to Cart';
+    }
+
+    // Update Wishlist button visual state in modal
+    const isWishlisted = wishlist.some(p => p.id === currentProduct.id);
+    const wishlistBtn = $('modal-wishlist-btn');
+    if (isWishlisted) {
+      wishlistBtn.textContent = '❤️';
+      wishlistBtn.title = 'Remove from Wishlist';
+      wishlistBtn.style.color = '#ef4444';
+    } else {
+      wishlistBtn.textContent = '🤍';
+      wishlistBtn.title = 'Add to Wishlist';
+      wishlistBtn.style.color = '';
     }
 
     // Load reviews
@@ -437,6 +530,128 @@ function updateCartUI() {
   $('cart-pricing').innerHTML = pricingHtml;
 }
 
+// Wishlist Logic
+function toggleWishlist(productId) {
+  const prod = products.find(p => p.id === productId);
+  if (!prod) return;
+
+  const idx = wishlist.findIndex(p => p.id === productId);
+  if (idx > -1) {
+    wishlist.splice(idx, 1);
+  } else {
+    wishlist.push(prod);
+  }
+  localStorage.setItem('stridex_wishlist', JSON.stringify(wishlist));
+  updateWishlistUI();
+}
+
+function updateWishlistUI() {
+  $('wishlist-count').textContent = wishlist.length;
+
+  const container = $('wishlist-items');
+  container.innerHTML = '';
+
+  if (wishlist.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-5 w-100">
+        <p class="text-muted">Your saved wishlist is empty.</p>
+      </div>
+    `;
+    return;
+  }
+
+  wishlist.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'wishlist-item-card';
+    card.innerHTML = `
+      <img src="${p.image_url}" alt="${p.name}" class="wishlist-item-img">
+      <div class="wishlist-item-details">
+        <div class="wishlist-item-brand">${p.brand}</div>
+        <div class="wishlist-item-name">${p.name}</div>
+        <div class="wishlist-item-price">₹${p.price.toFixed(2)}</div>
+      </div>
+      <div class="wishlist-item-actions">
+        <button class="wishlist-item-add-btn" data-id="${p.id}">Add to Cart</button>
+        <button class="wishlist-item-remove-btn" data-id="${p.id}">Remove</button>
+      </div>
+    `;
+
+    // Bind item wishlist actions
+    card.querySelector('.wishlist-item-add-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openProductModal(p.id);
+      $('wishlist-modal').close();
+    });
+
+    card.querySelector('.wishlist-item-remove-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWishlist(p.id);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function handleModalWishlistToggle() {
+  if (!currentProduct) return;
+  toggleWishlist(currentProduct.id);
+
+  // Update modal icon status
+  const isWishlisted = wishlist.some(p => p.id === currentProduct.id);
+  const btn = $('modal-wishlist-btn');
+  if (isWishlisted) {
+    btn.textContent = '❤️';
+    btn.style.color = '#ef4444';
+  } else {
+    btn.textContent = '🤍';
+    btn.style.color = '';
+  }
+}
+
+// Autocomplete suggestions search logic
+function showSearchSuggestions(inputEl, suggestionsEl) {
+  const text = inputEl.value.trim().toLowerCase();
+  if (!text) {
+    suggestionsEl.classList.add('d-none');
+    return;
+  }
+
+  // Filter products by search text matching name or brand
+  const matches = products.filter(p => 
+    p.name.toLowerCase().includes(text) || 
+    p.brand.toLowerCase().includes(text) || 
+    p.category.toLowerCase().includes(text)
+  );
+
+  if (matches.length === 0) {
+    suggestionsEl.classList.add('d-none');
+    return;
+  }
+
+  suggestionsEl.innerHTML = matches.slice(0, 5).map(p => `
+    <div class="suggestion-item" data-id="${p.id}">
+      <img src="${p.image_url}" class="suggestion-thumb" alt="${p.name}">
+      <div class="suggestion-info">
+        <span class="suggestion-title">${p.name}</span>
+        <span class="suggestion-meta">${p.brand} | ₹${p.price.toLocaleString()}</span>
+      </div>
+      <span class="suggestion-price">🥾</span>
+    </div>
+  `).join('');
+
+  suggestionsEl.classList.remove('d-none');
+
+  // Bind clicks on suggestions
+  suggestionsEl.querySelectorAll('.suggestion-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const pId = parseInt(item.getAttribute('data-id'));
+      openProductModal(pId);
+      suggestionsEl.classList.add('d-none');
+      inputEl.value = '';
+    });
+  });
+}
+
 // Update the Shipping Tracker Progress Bar (Gamified Feature)
 function updateShippingTracker(subtotal) {
   const milestone = 12000.0;
@@ -517,7 +732,7 @@ async function handleCheckoutSubmit(e) {
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const oldText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing Transaction...';
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Validating with Stripe Card Gateways...';
 
   const customerName = $('cust-name').value;
   const customerEmail = $('cust-email').value;
@@ -534,6 +749,9 @@ async function handleCheckoutSubmit(e) {
   };
 
   try {
+    // Artificial 2-second delay to show high-fidelity loading verification transition
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -652,6 +870,12 @@ async function syncMentorConsole() {
           `<div class="small"><strong>${it.product_name}</strong> (Size ${it.size} | ${it.color}) x${it.quantity}</div>`
         ).join('');
 
+        // Interactive status select list dropdown control for mentor updates
+        const statuses = ['Processing', 'Shipped', 'Delivered'];
+        const selectOptions = statuses.map(st => 
+          `<option value="${st}" ${o.status === st ? 'selected' : ''}>${st}</option>`
+        ).join('');
+
         tr.innerHTML = `
           <td><code class="text-warning">#${o.id}</code></td>
           <td>
@@ -659,7 +883,12 @@ async function syncMentorConsole() {
             <div class="text-muted small">${o.customer_email}</div>
           </td>
           <td>${itemsHtml}</td>
-          <td><strong class="text-white">₹${o.total_price.toFixed(2)}</strong></td>
+          <td>
+            <strong class="text-white d-block mb-1">₹${o.total_price.toFixed(2)}</strong>
+            <select class="form-select sort-select py-1 px-2 border-secondary text-white rounded bg-dark order-status-updater" data-id="${o.id}" style="font-size: 11px;">
+              ${selectOptions}
+            </select>
+          </td>
           <td>
             <div>${new Date(o.created_at).toLocaleDateString()}</div>
             <div class="text-muted small">${timeStr}</div>
@@ -667,17 +896,26 @@ async function syncMentorConsole() {
         `;
         ordersBody.appendChild(tr);
       });
+
+      // Bind dynamic change listener to dropdowns
+      document.querySelectorAll('.order-status-updater').forEach(sel => {
+        sel.addEventListener('change', async (e) => {
+          const orderId = e.target.getAttribute('data-id');
+          const newStatus = e.target.value;
+          await updateOrderStatusInDb(orderId, newStatus);
+        });
+      });
     }
 
     // 2. Fetch products details for catalog stock checking
     const resProducts = await fetch('/api/products?sort=popular');
     if (!resProducts.ok) throw new Error();
-    const products = await resProducts.json();
+    const productsList = await resProducts.json();
 
     const productsBody = $('products-table-body');
     productsBody.innerHTML = '';
 
-    products.forEach(p => {
+    productsList.forEach(p => {
       const tr = document.createElement('tr');
       const stockBadgeColor = p.stock <= 0 ? '#ef4444' : (p.stock <= 4 ? '#f59e0b' : '#10b981');
       
@@ -689,16 +927,102 @@ async function syncMentorConsole() {
         <td><span class="text-muted small">${p.sizes}</span></td>
         <td><span class="text-warning">${p.rating} ★</span> <span class="text-muted">(${p.reviews_count})</span></td>
         <td>
-          <span class="admin-badge fw-bold" style="background-color: rgba(255,255,255,0.05); color: ${stockBadgeColor}; border: 1px solid rgba(255,255,255,0.05);">
-            ${p.stock} Units
-          </span>
+          <div class="d-flex align-items-center gap-2">
+            <input type="number" class="form-control text-white bg-dark border-secondary px-2 py-1 text-center product-stock-input" data-id="${p.id}" value="${p.stock}" style="width: 70px; font-size: 12px;">
+            <span class="admin-badge fw-bold" style="background-color: rgba(255,255,255,0.05); color: ${stockBadgeColor}; border: 1px solid rgba(255,255,255,0.05);">
+              Units
+            </span>
+          </div>
         </td>
       `;
       productsBody.appendChild(tr);
     });
 
+    // Bind stock inputs
+    document.querySelectorAll('.product-stock-input').forEach(inp => {
+      inp.addEventListener('change', async (e) => {
+        const prodId = e.target.getAttribute('data-id');
+        const newStock = parseInt(e.target.value) || 0;
+        await updateProductStockInDb(prodId, newStock);
+      });
+    });
+
+    // Calculate Summary statistics
+    renderMentorSummary(orders);
+
   } catch (err) {
-    console.warn("Failed to synchronize mentor database tables logs");
+    console.warn("Failed to synchronize mentor database tables logs", err);
+  }
+}
+
+// Calculate and render dashboard stats in Mentor Console
+function renderMentorSummary(orders) {
+  let revenue = 0;
+  orders.forEach(o => {
+    revenue += o.total_price;
+  });
+
+  const avgOrder = orders.length > 0 ? (revenue / orders.length) : 0;
+  
+  // Find or insert summary row in mentor console
+  let summaryRow = $('mentor-console-summary');
+  if (!summaryRow) {
+    summaryRow = document.createElement('div');
+    summaryRow.id = 'mentor-console-summary';
+    summaryRow.className = 'row g-3 mb-4';
+    $('mentor-console-body').insertBefore(summaryRow, $('mentor-console-body').firstChild);
+  }
+
+  summaryRow.innerHTML = `
+    <div class="col-sm-4">
+      <div class="p-3 bg-dark border border-secondary rounded text-center">
+        <div class="text-muted small text-uppercase fw-bold tracking-wider">Total Sales Revenue</div>
+        <div class="h4 text-accent fw-bold mt-1">₹${revenue.toFixed(2)}</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="p-3 bg-dark border border-secondary rounded text-center">
+        <div class="text-muted small text-uppercase fw-bold tracking-wider">Total Transactions</div>
+        <div class="h4 text-white fw-bold mt-1">${orders.length} Orders</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="p-3 bg-dark border border-secondary rounded text-center">
+        <div class="text-muted small text-uppercase fw-bold tracking-wider">Average Ticket Size</div>
+        <div class="h4 text-white fw-bold mt-1">₹${avgOrder.toFixed(2)}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Backend update status API call
+async function updateOrderStatusInDb(orderId, status) {
+  try {
+    const res = await fetch(`/api/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) throw new Error();
+    syncMentorConsole();
+  } catch (err) {
+    alert("Could not update order status on SQLite backend.");
+  }
+}
+
+// Backend update stock API call
+async function updateProductStockInDb(prodId, stock) {
+  try {
+    const res = await fetch(`/api/products/${prodId}/stock`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stock })
+    });
+    if (!res.ok) throw new Error();
+    loadProducts();
+    syncMentorConsole();
+  } catch (err) {
+    alert("Could not update product stock on SQLite backend.");
   }
 }
 
@@ -717,11 +1041,15 @@ async function resetDatabase() {
     
     // Clear cart and states
     cart = [];
+    wishlist = [];
     promoDiscount = 0.0;
+    compareList = [];
     $('promo-input').value = '';
     $('promo-active-msg').classList.add('d-none');
     saveCart();
     updateCartUI();
+    updateWishlistUI();
+    updateCompareUI();
 
     // Reload layouts
     loadProducts();
@@ -731,6 +1059,7 @@ async function resetDatabase() {
     $('product-modal').close();
     $('cart-modal').close();
     $('checkout-modal').close();
+    $('wishlist-modal').close();
   } catch (err) {
     alert(`Reset Error: ${err.message}`);
   }
@@ -748,7 +1077,7 @@ function setupCustomizerDefaultColors() {
 // Populate Customizer Dropdown
 function populateCustomizerDropdown() {
   const select = $('cust-base-shoe');
-  if (select.children.length > 0) return; // already populated
+  if (!select || select.children.length > 0) return; // already populated
 
   products.forEach(p => {
     const opt = document.createElement('option');
@@ -764,7 +1093,7 @@ function handleSwatchClick(e) {
   if (!color) return;
 
   // Update active swatch state
-  document.querySelectorAll('.swatch-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.swatches-grid .swatch-btn').forEach(el => el.classList.remove('active'));
   e.target.classList.add('active');
 
   // Recolor SVG element
@@ -782,6 +1111,14 @@ function handleSwatchClick(e) {
   const colorName = colorNames[color] || color;
   const partText = activeCustomizerPart.replace('shoe-', '').toUpperCase();
   $('part-color-label').textContent = `3. Apply ${colorName} to ${partText}`;
+
+  // Trigger brief rotate animation in Customizer SVG to represent 3D render feedback
+  const svg = $('customizer-svg');
+  svg.style.transition = 'transform 0.5s ease';
+  svg.style.transform = 'rotate(-5deg) scale(1.02)';
+  setTimeout(() => {
+    svg.style.transform = 'rotate(0deg) scale(1)';
+  }, 400);
 }
 
 // Handle Add Custom Sneaker to Cart
@@ -843,12 +1180,420 @@ function handleAddCustomToCart() {
   updateCartUI();
   openCartDrawer();
   
-  // Quick alert overlay toast simulation
   alert(`Bespoke ${baseShoe.name} added to shopping drawer with a +₹1,500 custom laboratory dye premium!`);
+}
+
+// User Authentication handler
+function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email = $('auth-email').value.trim();
+  const name = email.split('@')[0];
+
+  // Set mock member credentials session
+  currentUser = {
+    name: name.charAt(0).toUpperCase() + name.slice(1),
+    email: email,
+    size: '10',
+    address: '123 StrideX Way, Silicon Valley'
+  };
+
+  localStorage.setItem('stridex_user', JSON.stringify(currentUser));
+  initAuthUI();
+  $('auth-modal').close();
+  $('auth-dropdown').style.display = 'none';
+
+  // Prefill default checkout fields
+  $('cust-name').value = currentUser.name;
+  $('cust-email').value = currentUser.email;
+  $('cust-address').value = currentUser.address;
+
+  alert(`Welcome, ${currentUser.name}! You are now signed in.`);
+}
+
+// User Profile management
+function handleProfileSubmit(e) {
+  e.preventDefault();
+  if (!currentUser) return;
+
+  currentUser.name = $('profile-name').value;
+  currentUser.address = $('profile-address').value;
+  currentUser.size = $('profile-size').value;
+
+  localStorage.setItem('stridex_user', JSON.stringify(currentUser));
+  initAuthUI();
+  $('profile-modal').close();
+
+  // Update prefilled forms
+  $('cust-name').value = currentUser.name;
+  $('cust-address').value = currentUser.address;
+
+  alert("Profile preferences successfully saved!");
+}
+
+// User Profile logout
+function handleLogout() {
+  currentUser = null;
+  localStorage.removeItem('stridex_user');
+  initAuthUI();
+  $('auth-dropdown').style.display = 'none';
+
+  // Clear checkout forms
+  $('cust-name').value = '';
+  $('cust-email').value = '';
+  $('cust-address').value = '';
+
+  alert("You have logged out of your session.");
+}
+
+// Product Comparison logics
+function handleProductCompareToggle(e) {
+  e.stopPropagation();
+  if (!currentProduct) return;
+
+  const exists = compareList.some(p => p.id === currentProduct.id);
+  if (exists) {
+    compareList = compareList.filter(p => p.id !== currentProduct.id);
+  } else {
+    if (compareList.length >= 3) {
+      alert("You can compare a maximum of 3 shoes at a time.");
+      return;
+    }
+    compareList.push(currentProduct);
+  }
+
+  updateCompareUI();
+  $('product-modal').close();
+}
+
+function removeCompareItem(prodId) {
+  compareList = compareList.filter(p => p.id !== prodId);
+  updateCompareUI();
+}
+
+function updateCompareUI() {
+  // Badges update
+  $('compare-badge-count').textContent = compareList.length;
+  $('compare-btn-count').textContent = compareList.length;
+
+  const compareBar = $('compare-bar');
+  const thumbsContainer = $('compare-thumbnails');
+  thumbsContainer.innerHTML = '';
+
+  if (compareList.length === 0) {
+    compareBar.classList.add('d-none');
+    return;
+  }
+
+  compareBar.classList.remove('d-none');
+
+  compareList.forEach(p => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'position-relative';
+    wrapper.innerHTML = `
+      <img src="${p.image_url}" class="compare-thumb" alt="${p.name}">
+      <button class="position-absolute bg-danger text-white border-0 rounded-circle small d-flex align-items-center justify-content-center text-center px-1" 
+              style="width: 16px; height: 16px; top: -5px; right: -5px; font-size: 8px; cursor: pointer;" 
+              onclick="removeCompareItem(${p.id})">&times;</button>
+    `;
+    thumbsContainer.appendChild(wrapper);
+  });
+}
+
+// Build and show compare table inside modal
+function showCompareModal() {
+  if (compareList.length === 0) return;
+
+  const head = $('compare-table-head');
+  const body = $('compare-table-body');
+
+  head.innerHTML = `<th>Features / Spec</th>` + compareList.map(p => `
+    <th>
+      <img src="${p.image_url}" alt="${p.name}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px;"><br>
+      <span class="small fw-bold text-white">${p.name}</span>
+    </th>
+  `).join('');
+
+  const specs = [
+    { label: "Price", key: "price", format: val => `₹${val.toFixed(2)}` },
+    { label: "Brand", key: "brand" },
+    { label: "Category", key: "category" },
+    { label: "Rating Stars", key: "rating", format: val => `${getStarRatingHTML(val)} (${val} ★)` },
+    { label: "Sizes (US)", key: "sizes" },
+    { label: "Colors Available", key: "colors" },
+    { label: "Description", key: "description", wrap: true }
+  ];
+
+  body.innerHTML = specs.map(sp => {
+    let cells = compareList.map(p => {
+      let val = p[sp.key];
+      if (sp.format) val = sp.format(val);
+      return `<td class="${sp.wrap ? 'small text-muted text-start' : 'small text-white'}" style="${sp.wrap ? 'min-width: 180px; line-height: 1.4;' : ''}">${val}</td>`;
+    }).join('');
+    return `<tr><td class="fw-semibold text-secondary small text-start">${sp.label}</td>${cells}</tr>`;
+  }).join('');
+
+  $('compare-modal').showModal();
+}
+
+// User Tracking timeline renderer
+async function renderOrderTracking(orderId) {
+  const container = $('tracking-content');
+  container.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></div>`;
+
+  try {
+    const res = await fetch('/api/orders');
+    if (!res.ok) throw new Error();
+    const orders = await res.json();
+
+    const order = orders.find(o => o.id === orderId);
+    if (!order) {
+      container.innerHTML = `<p class="text-danger text-center">Order not found.</p>`;
+      return;
+    }
+
+    // Determine status stages completion state
+    // Stages: Processing -> Shipped -> Delivered
+    const steps = [
+      { key: 'Processing', title: 'Nitrogen foam compound prep (Processing)', icon: '🧪' },
+      { key: 'Shipped', title: 'Express priority air dispatch (Shipped)', icon: '✈️' },
+      { key: 'Delivered', title: 'Hand delivered & signed (Delivered)', icon: '📦' }
+    ];
+
+    let currentIdx = steps.findIndex(st => st.key === order.status);
+    if (currentIdx === -1) currentIdx = 0; // fallback
+
+    let stepsMarkup = steps.map((st, idx) => {
+      let statusClass = '';
+      if (idx < currentIdx) {
+        statusClass = 'completed';
+      } else if (idx === currentIdx) {
+        statusClass = 'active';
+      }
+      return `
+        <div class="tracking-step ${statusClass}">
+          <div class="tracking-icon">${st.icon}</div>
+          <div class="tracking-label">
+            <div class="fw-bold">${st.key}</div>
+            <div class="small text-muted mt-1" style="font-size: 11.5px;">${st.title}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Compute progress line height percent
+    let progressPercent = 0;
+    if (currentIdx === 1) progressPercent = 50;
+    if (currentIdx === 2) progressPercent = 100;
+
+    container.innerHTML = `
+      <div class="p-3 bg-dark border border-secondary rounded-4 mb-4">
+        <div class="row g-2 small">
+          <div class="col-6"><strong>Order ID:</strong> <code class="text-warning">#${order.id}</code></div>
+          <div class="col-6 text-end"><strong>Amount:</strong> ₹${order.total_price.toFixed(2)}</div>
+          <div class="col-12 mt-1"><strong>Invoice Customer:</strong> ${order.customer_name} (${order.customer_email})</div>
+        </div>
+      </div>
+
+      <div class="tracking-timeline">
+        <div class="tracking-line-bar"></div>
+        <div class="tracking-line-progress" style="height: ${progressPercent}%;"></div>
+        ${stepsMarkup}
+      </div>
+    `;
+
+  } catch (err) {
+    container.innerHTML = `<p class="text-danger text-center">Failed to fetch live order tracking.</p>`;
+  }
+}
+
+// User Profile Orders History list
+async function loadUserOrdersHistory() {
+  if (!currentUser) {
+    alert("Please sign in to access tracking dashboards.");
+    return;
+  }
+
+  const container = $('orders-list-content');
+  container.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-warning" role="status"></div></div>`;
+
+  $('orders-list-modal').showModal();
+
+  try {
+    const res = await fetch('/api/orders');
+    if (!res.ok) throw new Error();
+    const allOrders = await res.json();
+
+    // Filter user's email orders
+    const userOrders = allOrders.filter(o => o.customer_email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (userOrders.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <p class="text-muted">No custom orders found matching email: <code>${currentUser.email}</code></p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = userOrders.map(o => {
+      const itemsText = o.items.map(it => 
+        `<span class="badge bg-secondary me-2 mt-1">${it.product_name} (US ${it.size} - ${it.color}) x${it.quantity}</span>`
+      ).join('');
+
+      const statusBadge = o.status === 'Delivered' ? 'bg-success' : (o.status === 'Shipped' ? 'bg-info' : 'bg-warning');
+
+      return `
+        <div class="order-list-item">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <span class="fw-bold text-white small">Order ID:</span>
+              <code class="text-warning">#${o.id}</code>
+            </div>
+            <span class="badge ${statusBadge}">${o.status}</span>
+          </div>
+          <div class="text-muted small mb-2">${new Date(o.created_at).toLocaleDateString()} at ${new Date(o.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+          <div class="mb-3">${itemsText}</div>
+          <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-2 mt-2">
+            <span class="fw-bold text-accent">Total: ₹${o.total_price.toFixed(2)}</span>
+            <button class="btn-accent py-1 px-3 small tracking-details-btn" data-id="${o.id}" style="font-size: 11.5px;">Track Order</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Bind event listeners to track details button clicks
+    container.querySelectorAll('.tracking-details-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const orderId = parseInt(e.target.getAttribute('data-id'));
+        $('orders-list-modal').close();
+        renderOrderTracking(orderId);
+        $('tracking-modal').showModal();
+      });
+    });
+
+  } catch (err) {
+    container.innerHTML = `<p class="text-danger text-center">Failed to load order history list.</p>`;
+  }
+}
+
+// Setup Stripe Mockup credit card flipping & input key listeners
+function setupStripeCardInputs() {
+  const card = $('checkout-modal').querySelector('.credit-card');
+  const cardNumDisplay = $('card-number-display');
+  
+  if (!card) return;
+
+  // Real-time Credit Card Display update bindings
+  $('card-number').addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    let matches = val.match(/\d{4,16}/g);
+    let match = matches && matches[0] || '';
+    let parts = [];
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+
+    if (parts.length > 0) {
+      e.target.value = parts.join(' ');
+      cardNumDisplay.textContent = parts.join(' ');
+    } else {
+      e.target.value = val;
+      cardNumDisplay.textContent = val || '4111 2222 3333 4444';
+    }
+  });
+
+  // Expiry focus flips / updates front
+  $('card-expiry').addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length >= 2) {
+      e.target.value = val.substring(0,2) + '/' + val.substring(2,4);
+    }
+  });
+
+  // CVC focus flips card to back, blur flips card to front
+  $('card-cvc').addEventListener('focus', () => {
+    card.classList.add('flipped');
+  });
+  $('card-cvc').addEventListener('blur', () => {
+    card.classList.remove('flipped');
+  });
+  $('card-cvc').addEventListener('input', (e) => {
+    $('card-signature-area').textContent = '*'.repeat(e.target.value.length);
+  });
+}
+
+// chatbot styling logic advisor conversations
+function handleSupportChatSubmit(e) {
+  e.preventDefault();
+  const inputEl = $('support-chat-input');
+  const body = $('support-chat-body');
+  const val = inputEl.value.trim();
+
+  if (!val) return;
+
+  // Render User Msg
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = val;
+  body.appendChild(userMsg);
+
+  inputEl.value = '';
+  body.scrollTop = body.scrollHeight;
+
+  // Bot response mapping
+  setTimeout(() => {
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot';
+    
+    const query = val.toLowerCase();
+    let reply = "I'm not sure about that model, but you can customized any StrideX shoe inside the Bespoke Sneaker Lab using champagne dye swatches.";
+
+    if (query.includes('size') || query.includes('sizing')) {
+      reply = "Our luxury shoes fit true to size (standard US widths). We recommend choosing your standard athletic running shoe size. You can also save a preferred sizing in your profile.";
+    } else if (query.includes('shipping') || query.includes('delivery')) {
+      reply = "We offer complimentary express air delivery on orders above ₹12,000. Orders below qualify for a ₹1,200 flat delivery premium. Custom colors take 3-5 curing days.";
+    } else if (query.includes('coupon') || query.includes('promo') || query.includes('discount')) {
+      reply = "To test coupon calculations, type MENTOR10 into the shopping drawer coupon box for a 10% invoice deduction!";
+    } else if (query.includes('price') || query.includes('cost') || query.includes('cheap')) {
+      reply = "Our collection starts from ₹6,999 (AquaDunk Hydro) up to ₹13,999 (VeloSpeed Pro). Creating custom bespoke dye colorways adds a +₹1,500 lab treatment premium.";
+    } else if (query.includes('squat') || query.includes('lift') || query.includes('gym')) {
+      reply = "I highly recommend the StrideTech ApexLift 500! It features flat zero-compression soles and midfoot strap anchors ideal for squats, deadlifts, and power cleans.";
+    } else if (query.includes('run') || query.includes('marathon') || query.includes('foam')) {
+      reply = "The StrideTech AeroRun 300 is our premier speed silhouette, utilizing a nitrogen-infused supercritical foam midsole for maximum energy rebound.";
+    }
+
+    botMsg.textContent = reply;
+    body.appendChild(botMsg);
+    body.scrollTop = body.scrollHeight;
+  }, 1000);
+}
+
+// AI Advisor main trigger banner matches styling recommendations
+function handleAiAdvisorTrigger() {
+  const widget = $('support-chat');
+  widget.classList.remove('d-none');
+
+  const body = $('support-chat-body');
+  const botMsg = document.createElement('div');
+  botMsg.className = 'chat-msg bot';
+
+  let matchStr = "ApexLift 500 (Brushed Gold/Black)";
+  if (activeCategory === 'Running') matchStr = "AeroRun 300 (Ice White/Cobalt)";
+  if (activeCategory === 'Trail') matchStr = "TrailMaster X (Forest Green/Amber)";
+  if (activeCategory === 'Casual') matchStr = "UrbanFlex Lo (Off-White/Tan)";
+  if (activeCategory === 'Sport') matchStr = "VeloSpeed Pro (Gloss White/Red)";
+
+  botMsg.textContent = `✨ AI Recommendation Engine Matching: Based on your filter category '${activeCategory}' and price range, I suggest trying the custom colorways on the ${matchStr}. You can adjust uppers or soles to matches details perfectly.`;
+  body.appendChild(botMsg);
+  body.scrollTop = body.scrollHeight;
 }
 
 // Event Listeners Mapping
 function wireEventListeners() {
+  // Theme Toggle Listener
+  $('theme-toggle-btn').addEventListener('click', toggleTheme);
+
   // Category tabs click triggers
   document.querySelectorAll('#category-tabs .tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -865,18 +1610,38 @@ function wireEventListeners() {
     loadProducts();
   });
 
-  // Search input triggers (desktop and mobile)
-  const handleSearchInput = (e) => {
+  // Search input autocomplete triggers (desktop and mobile)
+  $('search').addEventListener('input', (e) => {
     searchQuery = e.target.value;
+    showSearchSuggestions(e.target, $('search-suggestions'));
     loadProducts();
-  };
-  $('search').addEventListener('input', handleSearchInput);
-  $('search-mobile').addEventListener('input', handleSearchInput);
+  });
+  $('search-mobile').addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    showSearchSuggestions(e.target, $('search-suggestions-mobile'));
+    loadProducts();
+  });
+
+  // Hide search suggestions on document body clicks
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#search') && !e.target.closest('#search-suggestions')) {
+      $('search-suggestions').classList.add('d-none');
+    }
+    if (!e.target.closest('#search-mobile') && !e.target.closest('#search-suggestions-mobile')) {
+      $('search-suggestions-mobile').classList.add('d-none');
+    }
+  });
 
   // Modal closers
   $('modal-close').addEventListener('click', () => $('product-modal').close());
   $('cart-close').addEventListener('click', () => $('cart-modal').close());
   $('checkout-close').addEventListener('click', () => $('checkout-modal').close());
+  $('auth-close').addEventListener('click', () => $('auth-modal').close());
+  $('profile-close').addEventListener('click', () => $('profile-modal').close());
+  $('compare-close').addEventListener('click', () => $('compare-modal').close());
+  $('tracking-close').addEventListener('click', () => $('tracking-modal').close());
+  $('orders-list-close').addEventListener('click', () => $('orders-list-modal').close());
+  $('wishlist-close').addEventListener('click', () => $('wishlist-modal').close());
 
   // Close modals clicking outside
   document.querySelectorAll('dialog').forEach(dialog => {
@@ -891,6 +1656,12 @@ function wireEventListeners() {
   // Cart drawer triggers
   $('cart-btn').addEventListener('click', openCartDrawer);
   
+  // Wishlist drawer triggers
+  $('wishlist-btn').addEventListener('click', () => {
+    updateWishlistUI();
+    $('wishlist-modal').showModal();
+  });
+
   // Checkout trigger
   $('checkout').addEventListener('click', () => {
     $('cart-modal').close();
@@ -899,12 +1670,22 @@ function wireEventListeners() {
     $('checkout-form').classList.remove('d-none');
     $('checkout-success').classList.add('d-none');
     $('checkout-form').reset();
+
+    // Prefill checkout if user logged in
+    if (currentUser) {
+      $('cust-name').value = currentUser.name;
+      $('cust-email').value = currentUser.email;
+      $('cust-address').value = currentUser.address;
+    }
     
     $('checkout-modal').showModal();
   });
 
   // Cart item detail triggers (Add to cart)
   $('modal-add-btn').addEventListener('click', addItemToCart);
+
+  // Wishlist item detail triggers
+  $('modal-wishlist-btn').addEventListener('click', handleModalWishlistToggle);
 
   // Review & Specs Tabs switching triggers
   document.querySelectorAll('.modal-tab-trigger').forEach(trigger => {
@@ -953,7 +1734,7 @@ function wireEventListeners() {
 
       // Update swatch active outline matching active color of the part
       const activeColor = customizerColors[activeCustomizerPart];
-      document.querySelectorAll('.swatch-btn').forEach(sw => {
+      document.querySelectorAll('.swatches-grid .swatch-btn').forEach(sw => {
         sw.classList.remove('active');
         if (sw.getAttribute('data-color') === activeColor) {
           sw.classList.add('active');
@@ -968,7 +1749,7 @@ function wireEventListeners() {
   });
 
   // Customizer: Swatches click triggers
-  document.querySelectorAll('.swatch-btn').forEach(btn => {
+  document.querySelectorAll('.swatches-grid .swatch-btn').forEach(btn => {
     btn.addEventListener('click', handleSwatchClick);
   });
 
@@ -989,4 +1770,128 @@ function wireEventListeners() {
 
   // Promo code apply click trigger
   $('promo-apply-btn').addEventListener('click', applyPromoCode);
+
+  // Authentication Toggles & Dropdowns
+  $('auth-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!currentUser) {
+      // Clear form inputs
+      $('auth-form').reset();
+      $('auth-modal').showModal();
+    } else {
+      const dd = $('auth-dropdown');
+      dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+    }
+  });
+
+  // Hide Dropdown clicking elsewhere
+  document.addEventListener('click', () => {
+    $('auth-dropdown').style.display = 'none';
+  });
+
+  $('auth-form').addEventListener('submit', handleAuthSubmit);
+  $('logout-btn').addEventListener('click', handleLogout);
+
+  // User Profile dialog triggers
+  $('view-profile-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!currentUser) return;
+    $('profile-name').value = currentUser.name;
+    $('profile-address').value = currentUser.address;
+    $('profile-size').value = currentUser.size;
+    $('profile-name-display').textContent = currentUser.name;
+    $('profile-modal').showModal();
+  });
+  $('profile-form').addEventListener('submit', handleProfileSubmit);
+
+  // Order List tracking triggers
+  $('view-orders-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    loadUserOrdersHistory();
+  });
+
+  // Product Comparison Triggers
+  $('modal-compare-btn').addEventListener('click', handleProductCompareToggle);
+  $('compare-trigger-btn').addEventListener('click', showCompareModal);
+  $('view-compare-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    showCompareModal();
+  });
+  $('compare-clear-btn').addEventListener('click', () => {
+    compareList = [];
+    updateCompareUI();
+  });
+
+  // Advanced filters checkbox brand list
+  document.querySelectorAll('.brand-checkbox').forEach(chk => {
+    chk.addEventListener('change', () => {
+      activeBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(el => el.value);
+      applyClientFilters();
+    });
+  });
+
+  // Advanced price range slider
+  $('price-range').addEventListener('input', (e) => {
+    activeMaxPrice = parseInt(e.target.value);
+    $('price-slider-value').textContent = `₹${activeMaxPrice.toLocaleString()}`;
+    applyClientFilters();
+  });
+
+  // Advanced size filter buttons
+  document.querySelectorAll('.filter-size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-size-btn').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      activeSizeFilter = btn.getAttribute('data-size');
+      applyClientFilters();
+    });
+  });
+
+  // Advanced color filter buttons
+  document.querySelectorAll('.filter-color-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-color-btn').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      activeColorFilter = btn.getAttribute('data-color');
+      applyClientFilters();
+    });
+  });
+
+  // Reset/Clear Filters button
+  $('clear-filters-btn').addEventListener('click', () => {
+    // Reset check state
+    document.querySelectorAll('.brand-checkbox').forEach(el => el.checked = true);
+    activeBrands = ['StrideTech', 'TerraFit', 'MetroStep', 'VolleyEdge'];
+
+    // Reset range slider
+    $('price-range').value = 15000;
+    activeMaxPrice = 15000;
+    $('price-slider-value').textContent = `₹15,000`;
+
+    // Reset size buttons
+    document.querySelectorAll('.filter-size-btn').forEach(el => el.classList.remove('active'));
+    document.querySelector('.filter-size-btn[data-size="all"]').classList.add('active');
+    activeSizeFilter = 'all';
+
+    // Reset color buttons
+    document.querySelectorAll('.filter-color-btn').forEach(el => el.classList.remove('active'));
+    document.querySelector('.filter-color-btn[data-color="all"]').classList.add('active');
+    activeColorFilter = 'all';
+
+    applyClientFilters();
+  });
+
+  // Live support styling advisor forms
+  $('support-chat-form').addEventListener('submit', handleSupportChatSubmit);
+  
+  // Toggle support floating panel chat
+  $('support-toggle').addEventListener('click', () => {
+    const chat = $('support-chat');
+    chat.classList.toggle('d-none');
+  });
+  $('support-chat-close').addEventListener('click', () => {
+    $('support-chat').classList.add('d-none');
+  });
+
+  $('ai-advisor-trigger').addEventListener('click', handleAiAdvisorTrigger);
 }
